@@ -19,4 +19,9 @@ void     set_uart_log_onoff( uint32_t val );
 uint32_t get_spi_log_onoff();
 void     set_spi_log_onoff( uint32_t val );
 
+//--------------------------
+// BINÉçÉOÇÃê›íË
+uint32_t get_bin_log_onoff();
+void     set_bin_log_onoff( uint32_t val );
+
 #endif

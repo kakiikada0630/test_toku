@@ -5,7 +5,7 @@
 
 //デバッグ用ピン
 #define DEBUG_PWM_PIN      GPIO_NUM_25
-#define DEBUG_OUT1_PIN     GPIO_NUM_22
+#define DEBUG_OUT1_PIN     -1
 
 //SPIスレーブ用ピン
 #define SPI_SLAVE_MISO_PIN -1
@@ -34,6 +34,8 @@
 #define GPIO_B2             GPIO_NUM_39
 #define GPIO_B3             GPIO_NUM_36
 #define GPIO_DISCHARGE      GPIO_NUM_35
+#define GPIO_UDIM21         GPIO_NUM_23
+#define GPIO_UDIM22         GPIO_NUM_22
 
 //GPIO出力制御ピン
 #define GPIO_TURNSYNC_PIN   GPIO_NUM_12

@@ -87,14 +87,14 @@ void init_spi_slave()
 
 	//-----------------------------
 	//デバッグ用ピン
-	gpio_config_t config = {
-		.pin_bit_mask = (((uint64_t) 1) << DEBUG_OUT1_PIN),
-		.mode         = GPIO_MODE_OUTPUT,
-		.pull_up_en   = 0,
-		.pull_down_en = 0,
-		.intr_type    = GPIO_INTR_DISABLE
-	};
-	gpio_config( &config );
+	//gpio_config_t config = {
+	//	.pin_bit_mask = (((uint64_t) 1) << DEBUG_OUT1_PIN),
+	//	.mode         = GPIO_MODE_OUTPUT,
+	//	.pull_up_en   = 0,
+	//	.pull_down_en = 0,
+	//	.intr_type    = GPIO_INTR_DISABLE
+	//};
+	//gpio_config( &config );
 	//-----------------------------
 }
 

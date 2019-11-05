@@ -20,6 +20,8 @@
 #include "gpio_B1.h"
 #include "gpio_B2.h"
 #include "gpio_B3.h"
+#include "gpio_UDIM21.h"
+#include "gpio_UDIM22.h"
 #include "spi_slave_peri.h"
 #include "spi_master.h"
 #include "uart_lmm.h"
@@ -82,6 +84,7 @@ static void SendData(void *pvParameters)
 		uint32_t pwm_log  = get_pwm_log_onoff();
 		uint32_t spi_log  = get_spi_log_onoff();
 		uint32_t uart_log = get_uart_log_onoff();
+		uint32_t bin_log  = get_bin_log_onoff();
 		start_time        = esp_timer_get_time();
 
 		if( pwm_log|spi_log|uart_log ) 
@@ -93,13 +96,15 @@ static void SendData(void *pvParameters)
 
 		if( pwm_log )
 		{
-	        printf("%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d ",
+	        printf("%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d ",
 	                  get_percent_discharge()/100,get_percent_discharge()%100,
 	                  get_percent_A1()/100,get_percent_A1()%100,
 	                  get_percent_A2()/100,get_percent_A2()%100,
 	                  get_percent_B1()/100,get_percent_B1()%100,
 	                  get_percent_B2()/100,get_percent_B2()%100,
-	                  get_percent_B3()/100,get_percent_B3()%100
+	                  get_percent_B3()/100,get_percent_B3()%100,
+	                  get_percent_UDIM21()/100,get_percent_UDIM21()%100,
+	                  get_percent_UDIM22()/100,get_percent_UDIM22()%100
 	                  );
 	    }
 
@@ -124,6 +129,56 @@ static void SendData(void *pvParameters)
 		if( pwm_log|spi_log|uart_log ) 
 		{
 			printf("\n");
+		}
+
+		if( bin_log )
+		{
+			unsigned char bin_buf[240];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			uint32_t *tick_pnt = 0;
+			uint16_t *buf_pnt  = 0;
+			uint8_t  *spi_pnt  = 0;
+			uint8_t  *urt_pnt  = 0;
+			
+			tick_pnt = (uint32_t *)&bin_buf[8]  ;
+			buf_pnt  = (uint16_t *)&bin_buf[12] ;
+			spi_pnt  = (uint8_t  *)&bin_buf[40] ;
+			urt_pnt  = (uint8_t  *)&bin_buf[140];
+			
+			memset(bin_buf, 0, 240 );
+			
+			//スタート符号
+			for(uint32_t j=0 ; j < 8 ; j++ )
+			{
+				bin_buf[j]=j+0xE0;
+			}
+			
+			//チック
+			*tick_pnt = (int32_t) (start_time/1000);
+
+			//PWM
+			*(buf_pnt+0)=(uint16_t)get_percent_discharge();
+			*(buf_pnt+1)=(uint16_t)get_percent_A1();
+			*(buf_pnt+2)=(uint16_t)get_percent_A2();
+			*(buf_pnt+3)=(uint16_t)get_percent_B1();
+			*(buf_pnt+4)=(uint16_t)get_percent_B2();
+			*(buf_pnt+5)=(uint16_t)get_percent_B3();
+			*(buf_pnt+6)=(uint16_t)get_percent_UDIM21();
+			*(buf_pnt+7)=(uint16_t)get_percent_UDIM22();
+
+			//SPI
+			uint8_t *spi_data_buf = (uint8_t *)spi_data;
+			for(uint32_t j=0 ; j<spi_size*2 ; j++)
+			{
+				*(spi_pnt+j) = *(spi_data_buf+j);
+			}
+			
+			//UART
+			for(uint32_t j=0 ; j<urt_size ; j++)
+			{
+				*(urt_pnt+j) = *(urt_data+j);
+			}
+			
+			fwrite(bin_buf, 240, 1, stdout);
 		}
 
         i++;
@@ -168,6 +223,8 @@ void app_main()
     init_gpio_B1();
     init_gpio_B2();
     init_gpio_B3();
+    init_gpio_UDIM21();
+    init_gpio_UDIM22();
 
 	init_cmd();
     init_spi_slave();

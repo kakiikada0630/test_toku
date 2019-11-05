@@ -138,6 +138,19 @@ static inline void CMD_DacControll( const char* op1, const char* op2 )
 	send_i2c_mcp4728( adc_ch, data );
 }
 
+static inline void CMD_BINARY_LOG( const char* op1 )
+{
+	if( 0 == memcmp(op1, "on", 2 ) )
+	{
+		set_bin_log_onoff( 1 );
+	}
+	else if( 0 == memcmp(op1, "off", 3 ) )
+	{
+		set_bin_log_onoff( 0 );
+	}
+	else{}
+}
+
 static void GetCmd(void *pvParameters)
 {
 	uint32_t index=0;
@@ -196,6 +209,10 @@ static void GetCmd(void *pvParameters)
 			else if( 0 == memcmp(cmd_buf, "dac", 3 ) )
 			{
 				CMD_DacControll( option1, option2 );
+			}
+			else if( 0 == memcmp(cmd_buf, "bin", 3 ) )
+			{
+				CMD_BINARY_LOG( option1 );
 			}
 			else if( 0 == memcmp(cmd_buf, "echo", 4 ) )
 			{
