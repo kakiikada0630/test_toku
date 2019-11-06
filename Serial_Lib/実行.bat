@@ -1,0 +1,1 @@
+analizer.exe COM5

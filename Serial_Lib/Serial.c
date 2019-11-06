@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fifo.h"
-#include "serial.h"
+#include "Serial.h"
 
 /* 1つのシリアル通信に関するデータ構造 */
 struct _TAG_SERIAL {
