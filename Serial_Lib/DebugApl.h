@@ -45,14 +45,20 @@ struct Parameter
 	int B_CUR         ;  // mA
 	int C_CUR         ;  // mA
 	int D_CUR         ;  // mA
+	int DAC_LCD       ;  // Åé * 100
+	int DAC_LED1      ;  // Åé * 100
+	int DAC_LED2      ;  // Åé * 100
+	int DAC_LED3      ;  // Åé * 100
 };
 
 
-DLLAPI void FileOpen( char *plabel, int size );
+DLLAPI void FileOpen( char *plabel );
 
 DLLAPI void FileClose();
 
 DLLAPI void OpenSerial(char* com_name);
+
+DLLAPI void CloseSerial();
 
 DLLAPI void WriteCmd( char* cmd );
 

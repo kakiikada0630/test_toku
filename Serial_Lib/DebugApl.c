@@ -8,11 +8,29 @@
 
 #include "DebugApl.h"
 
-FILE *output_org      = 0;
-FILE *output_analized = 0;
-serial_t obj;
 
 struct Parameter PARAM;
+
+typedef struct _TAG_SYSCTRL
+{
+#define FILE_LABEL_SIZE 100
+
+	BOOL file_open;
+	BOOL thread_active;
+	BOOL data_get;
+
+	CRITICAL_SECTION cs_data_get;
+
+	char label[FILE_LABEL_SIZE];
+	FILE *output_org;
+	FILE *output_analized;
+	serial_t obj;
+
+	HANDLE thread_handle;
+	DWORD thread_id;
+} sysctrl_t;
+
+static sysctrl_t sys_t={0};
 
 void Analize_PWM( unsigned char* buf, int size, struct Parameter *param )
 {
@@ -44,6 +62,11 @@ void Analize_SPI( unsigned char* buf, int size, struct Parameter *param )
 		// アドレス部含め、コマンドが0となることはないため、
 		// 0となるまでは有効コマンドが詰まっているものと解釈する。
 		if(*(buf16+cmd_size) == 0 ){ break; }
+	}
+
+	if( ( 0 != cmd_size%2 ) || ( cmd_size < BST_CMD_SIZE ) )
+	{
+		return;
 	}
 
 	buck_cmd_size = (cmd_size - BST_CMD_SIZE)/2;
@@ -255,6 +278,16 @@ void Analize_UART( unsigned char* buf, int size, struct Parameter *param )
 	param->PWM_D8 = StringD[ 7]*10000/1023;
 }
 
+void Analize_DAC( unsigned char* buf, int size, struct Parameter *param )
+{
+	short *dac_pnt = (short *)(buf+BLOCK_DAC);
+	
+	param->DAC_LCD  = *(dac_pnt  );
+	param->DAC_LED1 = *(dac_pnt+1);
+	param->DAC_LED2 = *(dac_pnt+2);
+	param->DAC_LED3 = *(dac_pnt+3);
+}
+
 void Analize( unsigned char* buf, int size, struct Parameter *param )
 {
 	unsigned int* tick_pnt = (unsigned int*)(buf+BLOCK_TICK);
@@ -263,6 +296,7 @@ void Analize( unsigned char* buf, int size, struct Parameter *param )
 	Analize_PWM (buf, size, param);
 	Analize_SPI (buf, size, param);
 	Analize_UART(buf, size, param);
+	Analize_DAC (buf, size, param);
 }
 
 void WriteLog( unsigned char* buf, int size, struct Parameter *param )
@@ -273,25 +307,25 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	unsigned char out[2000]={0};
 	unsigned char *buf8 = buf+BLOCK_PWM;
 
-	if( (output_org == 0) || (output_analized == 0) )
+	if( (sys_t.output_org == NULL) || (sys_t.output_analized == NULL) )
 	{
 		return;
 	}
 
-	fprintf(output_org,"[%7d]",param->TICK );
+	fprintf(sys_t.output_org,"[%7d]",param->TICK );
 
 	for( int i=0 ; i<BLOCK_SIZE-BLOCK_PWM ; i++ )
 	{
 		sprintf( out+i*2, "%02x", *(buf8+i) );
 	}
 
-	fprintf(output_org,"%s\n",out );
+	fprintf(sys_t.output_org,"%s\n",out );
 
 	//-----------------------------------------
 	//解析後の数値を書き出し
 	//-----------------------------------------
-	fprintf(output_analized,"[%7d]\t",param->TICK );
-	sprintf( out, "%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",
+	fprintf(sys_t.output_analized,"[%7d]\t",param->TICK );
+	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 					param->PWM_A1       ,
 					param->PWM_A2       ,
 					param->PWM_B1       ,
@@ -324,11 +358,102 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 					param->A_CUR        ,
 					param->B_CUR        ,
 					param->C_CUR        ,
-					param->D_CUR        );
-		fprintf(output_analized,"%s",out);
+					param->D_CUR        ,
+					param->DAC_LCD      ,
+					param->DAC_LED1     ,
+					param->DAC_LED2     ,
+					param->DAC_LED3     );
+		fprintf(sys_t.output_analized,"%s",out);
 
 	//-----------------------------------------
 }
+
+
+void FileOpenInt()
+{
+	// ファイル出力設定
+	char org_fname[256]     ={0};
+	char analized_fname[256]={0};
+	
+	sprintf( org_fname     , "%s_org.csv", sys_t.label );
+	sprintf( analized_fname, "%s_ana.csv", sys_t.label );
+
+	sys_t.output_org = fopen(org_fname, "w");  // ファイルを書き込み用にオープン(開く)
+	if (sys_t.output_org == NULL) {            // オープンに失敗した場合
+		printf("cannot open\n");         // エラーメッセージを出して
+		return;                          // 異常終了
+	}
+
+	sys_t.output_analized = fopen(analized_fname, "w");  // ファイルを書き込み用にオープン(開く)
+	if (sys_t.output_analized == NULL) {          // オープンに失敗した場合
+		printf("cannot open\n");            // エラーメッセージを出して
+		fclose(sys_t.output_org);
+		sys_t.output_org = NULL;
+		return;                            // 異常終了
+	}
+	
+	unsigned char out[300]={0};
+	fprintf(sys_t.output_analized,"BoostVol=(mV)\n",out);
+	fprintf(sys_t.output_analized,"x_CUR=(mA)\n",out);
+	fprintf(sys_t.output_analized,"xx_PWM=(0.01%/LSB)\n",out);
+	fprintf(sys_t.output_analized,"DAC_xxx=(℃)\n",out);
+	sprintf( out, "[Tick(us)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");	fprintf(sys_t.output_analized,"%s",out);
+}
+
+void FileCloseInt()
+{
+	fclose(sys_t.output_org     );
+	sys_t.output_org = NULL;
+	
+	fclose(sys_t.output_analized);
+	sys_t.output_analized = NULL;
+}
+
+
+DWORD WINAPI execute_thread(LPVOID param)
+{
+	unsigned char buf[1024]; 
+	int len;
+
+	while( sys_t.thread_active )
+	{
+		if( TRUE == sys_t.file_open )
+		{
+			if( (NULL == sys_t.output_org) || (NULL==sys_t.output_analized) )
+			{
+				FileOpenInt();
+			}
+		}
+
+		memset(buf, 0, sizeof(buf));
+		len = serial_recv_block(sys_t.obj,buf,sizeof(buf));
+		if (len){
+			Analize ( buf, len, &PARAM );
+			
+			TryEnterCriticalSection(&sys_t.cs_data_get);
+			sys_t.data_get = FALSE;
+			LeaveCriticalSection(&sys_t.cs_data_get);
+			
+			WriteLog( buf, len, &PARAM );
+		}
+		else
+		{
+			Sleep(4);
+		}
+		
+		if( FALSE == sys_t.file_open )
+		{
+			if( (NULL != sys_t.output_org) || (NULL != sys_t.output_analized) )
+			{
+				FileOpenInt();
+			}
+		}
+	}
+
+	ExitThread(TRUE);
+	return 0;
+}
+
 
 
 //---------------------------------------------------
@@ -336,57 +461,84 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 //---------------------------------------------------
 DLLAPI void OpenSerial(char* com_name)
 {
-	obj = serial_create(com_name,921600);
-	if ( obj == NULL ) {
+	sys_t.obj = serial_create(com_name,921600);
+	if ( sys_t.obj == NULL ) {
 		fprintf(stderr,"オブジェクト生成に失敗");
+		return;
 	}
+	
+	InitializeCriticalSection(&sys_t.cs_data_get);
 
-	sleep(1);
-	serial_send(obj,"bin on\n",sizeof("bin on\n"));
+	// 基板側の起動
+	Sleep(100);
+	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+
+	// スレッド処理実行開始
+	sys_t.thread_active = TRUE;
+	sys_t.thread_handle = CreateThread(NULL,0,execute_thread,NULL,0,&sys_t.thread_id);
+}
+
+DLLAPI void CloseSerial()
+{
+	DWORD thread_state;
+
+	// 基板側のシャットダウン
+	Sleep(100);
+	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
+
+	// スレッド処理実行終了
+	sys_t.file_open = FALSE;
+	Sleep(100);
+	sys_t.thread_active = FALSE;
+	do {
+		Sleep(1);
+		GetExitCodeThread(sys_t.thread_handle,&thread_state);
+	} while (thread_state == STILL_ACTIVE);
+
+	DeleteCriticalSection(&sys_t.cs_data_get);
+	sys_t.data_get = FALSE;
+
+	// シリアル処理の終了
+	serial_delete(sys_t.obj);
 }
 
 DLLAPI void WriteCmd( char* cmd )
 {
-	serial_send(obj,cmd,sizeof(cmd));
+	serial_send(sys_t.obj,cmd,strlen(cmd));
+	//printf("%d: %s",strlen(cmd), cmd);
 }
 
-DLLAPI void FileOpen( char *plabel, int size )
+DLLAPI void FileOpen( char *plabel )
 {
-	// ファイル出力設定
-	char org_fname[256]     ={0};
-	char analized_fname[256]={0};
-	
-	sprintf( org_fname     , "%s_org.csv", plabel );
-	sprintf( analized_fname, "%s_ana.csv", plabel );
-
-	output_org = fopen(org_fname, "w");  // ファイルを書き込み用にオープン(開く)
-	if (output_org == NULL) {            // オープンに失敗した場合
-		printf("cannot open\n");         // エラーメッセージを出して
-		exit(1);                         // 異常終了
-	}
-
-	output_analized = fopen(analized_fname, "w");  // ファイルを書き込み用にオープン(開く)
-	if (output_analized == NULL) {          // オープンに失敗した場合
-		printf("cannot open\n");            // エラーメッセージを出して
-		fclose(output_org);
-		exit(1);                            // 異常終了
-	}
-	
-	unsigned char out[300]={0};
-	fprintf(output_analized,"BoostVol=(mV)\n",out);
-	fprintf(output_analized,"x_CUR=(mA)\n",out);
-	fprintf(output_analized,"xx_PWM=(0.01%LSB)\n",out);
-	sprintf( out, "[Tick(us)]\tA1_PWM\tA2_PWM\tB1_PWM\tB2_PWM\tB3_PWM\tDISCHARGE_PWM\tUDIM21_PWM\tUDIM22_PWM\tC1_PWM\tC2_PWM\tC3_PWM\tC4_PWM\tC5_PWM\tC6_PWM\tC7_PWM\tC8_PWM\tC9_PWM\tC10_PWM\tC11_PWM\tC12_PWM\tD1_PWM\tD2_PWM\tD3_PWM\tD4_PWM\tD5_PWM\tD6_PWM\tD7_PWM\tD8_PWM\tBoostVol\tA_CUR\tB_CUR\tC_CUR\tD_CUR\n");	fprintf(output_analized,"%s",out);
+	memset(sys_t.label, 0, FILE_LABEL_SIZE);
+	sprintf(sys_t.label, "%s", plabel);
+	sys_t.file_open = TRUE;
 }
 
 DLLAPI void FileClose()
 {
-	fclose(output_org     );
-	fclose(output_analized);
+	sys_t.file_open = FALSE;
 }
 
 DLLAPI void GetParam( struct Parameter *param )
 {
+	TryEnterCriticalSection(&sys_t.cs_data_get);
+	sys_t.data_get = TRUE;
+	LeaveCriticalSection(&sys_t.cs_data_get);
+
+	while( sys_t.data_get )
+	{
+		Sleep(1);
+	}
+	
 	if( param != NULL )
 	{
 		*param = PARAM;
@@ -404,20 +556,26 @@ int main (int argc, char *argv[])
 	unsigned char buf[1024]; 
 	int len;
 
-	obj = serial_create(argv[1],921600);
-	if ( obj == NULL ) {
+	sys_t.obj = serial_create(argv[1],921600);
+	if ( sys_t.obj == NULL ) {
 		fprintf(stderr,"オブジェクト生成に失敗");
 		return EXIT_FAILURE;
 	}
 
-	FileOpen("data",sizeof("data"));
+	sprintf(sys_t.label, "%s", "data");
 
-	sleep(1);
-	serial_send(obj,"bin on\n",sizeof("bin on\n"));
+	FileOpenInt();
+
+	Sleep(100);
+	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
 
 	while (1) {
 		memset(buf, 0, sizeof(buf));
-		len = serial_recv_block(obj,buf,sizeof(buf));
+		len = serial_recv_block(sys_t.obj,buf,sizeof(buf));
 		if (len){
 			//printf("[%5d]\n",len); 
 			//fwrite(buf,len,1,stdout);
@@ -432,10 +590,18 @@ int main (int argc, char *argv[])
 		{
 			Sleep(4);
 		}
-    //if ( kbhit() )  break;
+		if ( kbhit() )  break;
 	}
 
-	serial_delete(obj);
+	Sleep(100);
+	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
+	Sleep(100);
+	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
+
+	FileCloseInt();
+	serial_delete(sys_t.obj);
 	return EXIT_SUCCESS;
 }
 

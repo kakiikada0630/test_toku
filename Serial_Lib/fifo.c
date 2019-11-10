@@ -72,7 +72,6 @@ unsigned int fifo_read_block(fifo_t *obj, unsigned char *buf, unsigned int size)
 		if(obj->read == obj->write)
 		{
 			// ブロック先頭を検出できなかったためここで処理終了
-			//printf("aaaaa %d, %d\n",obj->read,obj->write);
 			return ret;
 		}
 		
@@ -93,7 +92,6 @@ unsigned int fifo_read_block(fifo_t *obj, unsigned char *buf, unsigned int size)
 	if( BLOCK_SIZE > ( write_index - obj->read ) )
 	{
 		// ブロック情報のデータが不足している(=受信の途中)ため処理終了
-		//printf("bbbbb %d, %d\n",obj->read,obj->write);
 		return ret;
 	}
 
@@ -103,7 +101,6 @@ unsigned int fifo_read_block(fifo_t *obj, unsigned char *buf, unsigned int size)
 		obj->read = (obj->read + 1) % obj->size;
 	}
 	
-	//printf("ccccc %d, %d\n",obj->read,obj->write);
 	return ret;
 }
 
