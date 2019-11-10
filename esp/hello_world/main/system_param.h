@@ -24,4 +24,27 @@ void     set_spi_log_onoff( uint32_t val );
 uint32_t get_bin_log_onoff();
 void     set_bin_log_onoff( uint32_t val );
 
+//--------------------------
+// LCM温度
+uint32_t get_lcm_dec();
+void     set_lcm_dec( uint32_t val );
+
+//--------------------------
+// LED1温度
+uint32_t get_led1_dec();
+void     set_led1_dec( uint32_t val );
+
+//--------------------------
+// LED2温度
+uint32_t get_led2_dec();
+void     set_led2_dec( uint32_t val );
+
+//--------------------------
+// LED3温度
+uint32_t get_led3_dec();
+void     set_led3_dec( uint32_t val );
+
+//--------------------------
+
+
 #endif

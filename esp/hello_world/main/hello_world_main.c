@@ -133,18 +133,20 @@ static void SendData(void *pvParameters)
 
 		if( bin_log )
 		{
-			unsigned char bin_buf[240];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			unsigned char bin_buf[250];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
 			uint32_t *tick_pnt = 0;
 			uint16_t *buf_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
 			uint8_t  *urt_pnt  = 0;
+			uint16_t *adc_pnt  = 0;
 			
 			tick_pnt = (uint32_t *)&bin_buf[8]  ;
 			buf_pnt  = (uint16_t *)&bin_buf[12] ;
 			spi_pnt  = (uint8_t  *)&bin_buf[40] ;
 			urt_pnt  = (uint8_t  *)&bin_buf[140];
+			adc_pnt  = (uint16_t *)&bin_buf[240];
 			
-			memset(bin_buf, 0, 240 );
+			memset(bin_buf, 0, 250 );
 			
 			//スタート符号
 			for(uint32_t j=0 ; j < 8 ; j++ )
@@ -177,6 +179,11 @@ static void SendData(void *pvParameters)
 			{
 				*(urt_pnt+j) = *(urt_data+j);
 			}
+			
+			*(adc_pnt  ) = get_lcm_dec();
+			*(adc_pnt+1) = get_led1_dec();
+			*(adc_pnt+2) = get_led2_dec();
+			*(adc_pnt+3) = get_led3_dec();
 			
 			fwrite(bin_buf, 240, 1, stdout);
 		}
