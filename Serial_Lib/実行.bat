@@ -1,1 +1,1 @@
-analizer.exe COM5
+analizer.exe \\.\COM7

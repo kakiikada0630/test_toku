@@ -44,6 +44,8 @@ serial_t serial_create(char *pname, unsigned int baud)
 	ZeroMemory(obj,sizeof(struct _TAG_SERIAL));
 	obj->pname = pname;
 	
+	printf("%s\n",pname);
+	
 	// COMポートのハンドルを取得
 	obj->handle = CreateFile(pname,GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 	if ( obj->handle == INVALID_HANDLE_VALUE ) {
