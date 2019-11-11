@@ -324,7 +324,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	//-----------------------------------------
 	//‰ðÍŒã‚Ì”’l‚ð‘‚«o‚µ
 	//-----------------------------------------
-	fprintf(sys_t.output_analized,"[%7d]\t",param->TICK );
+	fprintf(sys_t.output_analized,"[%7d],",param->TICK );
 	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 					param->PWM_A1       ,
 					param->PWM_A2       ,

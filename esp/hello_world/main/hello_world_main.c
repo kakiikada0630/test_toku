@@ -30,7 +30,7 @@
 #include "system_param.h"
 
 
-#define SPI_DATA_SIZE 50  //uartデータサイズ
+#define SPI_DATA_SIZE 100  //uartデータサイズ
 #define URT_DATA_SIZE 100  //spiデータサイズ
 
 void set_pwm()
@@ -98,19 +98,19 @@ static void SendData(void *pvParameters)
 		{
 	        printf("%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d%4d.%2d ",
 	                  get_percent_discharge()/100,get_percent_discharge()%100,
-	                  get_percent_A1()/100,get_percent_A1()%100,
-	                  get_percent_A2()/100,get_percent_A2()%100,
-	                  get_percent_B1()/100,get_percent_B1()%100,
-	                  get_percent_B2()/100,get_percent_B2()%100,
-	                  get_percent_B3()/100,get_percent_B3()%100,
-	                  get_percent_UDIM21()/100,get_percent_UDIM21()%100,
-	                  get_percent_UDIM22()/100,get_percent_UDIM22()%100
+	                  get_percent_A1()       /100,get_percent_A1()       %100,
+	                  get_percent_A2()       /100,get_percent_A2()       %100,
+	                  get_percent_B1()       /100,get_percent_B1()       %100,
+	                  get_percent_B2()       /100,get_percent_B2()       %100,
+	                  get_percent_B3()       /100,get_percent_B3()       %100,
+	                  get_percent_UDIM21()   /100,get_percent_UDIM21()   %100,
+	                  get_percent_UDIM22()   /100,get_percent_UDIM22()   %100
 	                  );
 	    }
 
 		if( spi_log )
 		{
-			uint8_t *buf = (uint8_t *)spi_data;
+			uint8_t *buf         = (uint8_t *)spi_data;
 			uint8_t buf_spi_size = spi_size*2;
 			for(uint32_t j=0 ; j<buf_spi_size ; j++)
 			{
@@ -140,9 +140,9 @@ static void SendData(void *pvParameters)
 			uint8_t  *urt_pnt  = 0;
 			uint16_t *adc_pnt  = 0;
 			
-			tick_pnt = (uint32_t *)&bin_buf[8]  ;
-			buf_pnt  = (uint16_t *)&bin_buf[12] ;
-			spi_pnt  = (uint8_t  *)&bin_buf[40] ;
+			tick_pnt = (uint32_t *)&bin_buf[  8];
+			buf_pnt  = (uint16_t *)&bin_buf[ 12];
+			spi_pnt  = (uint8_t  *)&bin_buf[ 40];
 			urt_pnt  = (uint8_t  *)&bin_buf[140];
 			adc_pnt  = (uint16_t *)&bin_buf[240];
 			
@@ -185,7 +185,7 @@ static void SendData(void *pvParameters)
 			*(adc_pnt+2) = get_led2_dec();
 			*(adc_pnt+3) = get_led3_dec();
 			
-			fwrite(bin_buf, 240, 1, stdout);
+			fwrite(bin_buf, 250, 1, stdout);
 		}
 
         i++;
@@ -218,8 +218,8 @@ void app_main()
 	//------------------------
 	// デバッグ用初期化処理
 	//------------------------
-    init_spi_master();
-    set_pwm();
+    //init_spi_master();
+    //set_pwm();
     //send_uart();
 	//------------------------
 

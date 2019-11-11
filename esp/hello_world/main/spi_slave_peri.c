@@ -20,7 +20,7 @@
 #include "driver/gpio.h"
 #include "pin_assign.h"
 
-#define  QUE_SIZE   40
+#define  QUE_SIZE   200
 #define  BUF_SIZE    2 * QUE_SIZE
 
 static spi_slave_transaction_t      trans[QUE_SIZE];

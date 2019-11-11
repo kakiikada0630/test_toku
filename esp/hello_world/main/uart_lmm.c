@@ -13,7 +13,7 @@
 #include "driver/uart.h"
 #include "pin_assign.h"
 
-#define BUF_SIZE (100)
+#define BUF_SIZE (200)
 
 static uint8_t  *data;
 
@@ -72,7 +72,7 @@ void init_uart()
 
 void send_uart()
 {
-	xTaskCreatePinnedToCore(uart_sender, "uart_sender", 1024, NULL, 12, NULL, 1);
+	xTaskCreatePinnedToCore(uart_sender, "uart_sender", 2048, NULL, 12, NULL, 1);
 }
 
 uint32_t recv_uart(uint8_t* p_rec, uint32_t size)
