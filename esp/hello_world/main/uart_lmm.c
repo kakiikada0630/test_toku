@@ -47,8 +47,6 @@ static void uart_sender(void *pvParameters)
 			vTaskDelay(1);
 		}
 	}
-
-
 }
 
 void init_uart()

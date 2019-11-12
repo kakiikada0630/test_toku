@@ -24,7 +24,7 @@
 #define I2C_MASTER_SDA GPIO_NUM_18
 
 //UART用ピン
-#define UART_TX_PIN         -1
+#define UART_TX_PIN         GPIO_NUM_17
 #define UART_RX_PIN         GPIO_NUM_16
 
 //LED計測用ピン

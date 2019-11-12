@@ -397,7 +397,7 @@ void FileOpenInt()
 	fprintf(sys_t.output_analized,"x_CUR=(mA)\n",out);
 	fprintf(sys_t.output_analized,"xx_PWM=(0.01%/LSB)\n",out);
 	fprintf(sys_t.output_analized,"DAC_xxx=(Åé)\n",out);
-	sprintf( out, "[Tick(us)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");	fprintf(sys_t.output_analized,"%s",out);
+	sprintf( out, "[Tick(ms)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");	fprintf(sys_t.output_analized,"%s",out);
 }
 
 void FileCloseInt()

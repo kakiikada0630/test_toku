@@ -352,13 +352,13 @@ static inline void CMD_DacControll( const char* op1, const char* op2 )
 	}
 	else
 	{
-		sprintf( cmd ,"[AdcController]DAC ch Error!! %d\n", ch ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+		//sprintf( cmd ,"[AdcController]DAC ch Error!! %d\n", ch ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 		return;
 	}
 	
 	if( 0xfff < data )
 	{
-		sprintf( cmd ,"[AdcController]ADC data invalid!! 0x%x\n", data ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+		//sprintf( cmd ,"[AdcController]ADC data invalid!! 0x%x\n", data ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 		return;
 	}
 
@@ -409,9 +409,9 @@ static void GetCmd(void *pvParameters)
 		
 		if( data == '\n' )
 		{
-			char cmd_buf[20];
-			char option1[10];
-			char option2[10];
+			char cmd_buf[20]={0};
+			char option1[10]={0};
+			char option2[10]={0};
 			
 			sscanf( cmd ,"%s %s %s", cmd_buf, option1, option2 );
 			//fwrite( cmd, 20, 1, stdout );
@@ -454,7 +454,7 @@ static void GetCmd(void *pvParameters)
 			}
 			else if( 0 == memcmp(cmd_buf, "echo", 4 ) )
 			{
-				fwrite( cmd+5, CMD_BUF_SIZE-6, 1, stdout );
+				//fwrite( cmd+5, CMD_BUF_SIZE-6, 1, stdout );
 			}
 			else if( 0 == memcmp(cmd_buf, "help", 4 ) )
 			{
@@ -474,7 +474,7 @@ static void GetCmd(void *pvParameters)
 			}
 			else
 			{
-				sprintf( cmd ,"#Err Cmd. \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+				//sprintf( cmd ,"#Err Cmd. \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 			}
 
 
