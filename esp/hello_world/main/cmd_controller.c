@@ -386,14 +386,9 @@ static inline void CMD_BINARY_LOG( const char* op1 )
 	else{}
 }
 
-static void GetCmd(void *pvParameters)
+void exec_cmd()
 {
-	uint32_t index=0;
-	
-	CMD_DacControll( "0", "30" );
-	CMD_DacControll( "1", "30" );
-	CMD_DacControll( "2", "30" );
-	CMD_DacControll( "3", "30" );
+	static uint32_t index=0;
 
 	while(1)
 	{
@@ -401,7 +396,7 @@ static void GetCmd(void *pvParameters)
 		if( data <= 0 )
 		{
 			vTaskDelay(1);
-			continue;
+			break;
 		}
 
 		cmd[index] = (char)data;
@@ -529,5 +524,9 @@ void init_cmd()
 	//I2Cドライバ初期化 (ADC制御用)
 	init_i2c();
 
-	xTaskCreatePinnedToCore(GetCmd  , "cmd_controller", 1028, NULL, 12, NULL, 0);
+	CMD_DacControll( "0", "30" );
+	CMD_DacControll( "1", "30" );
+	CMD_DacControll( "2", "30" );
+	CMD_DacControll( "3", "30" );
+	//xTaskCreatePinnedToCore(GetCmd  , "cmd_controller", 1028, NULL, 12, NULL, 0);
 }

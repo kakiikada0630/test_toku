@@ -31,7 +31,7 @@
 
 
 #define SPI_DATA_SIZE 100  //uartデータサイズ
-#define URT_DATA_SIZE 100  //spiデータサイズ
+#define URT_DATA_SIZE 500  //spiデータサイズ
 
 void set_pwm()
 {
@@ -62,7 +62,7 @@ void set_pwm()
 }
 
 //static void SendData()
-static void SendData(void *pvParameters)
+void SendData()
 {
     int32_t         i              = 0;
     static int64_t  start_time     = 0;
@@ -188,7 +188,8 @@ static void SendData(void *pvParameters)
 			fwrite(bin_buf, 250, 1, stdout);
 		}
 
-        i++;
+		exec_cmd();
+		i++;
 
 		while(1)
 		{
@@ -236,10 +237,12 @@ void app_main()
 	init_cmd();
     init_spi_slave();
 
-	xTaskCreatePinnedToCore(SendData, "main_loop", 4096, NULL, 12, NULL, 0);
+	SendData();
 
-    while (1) 
-    {
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+	//xTaskCreatePinnedToCore(SendData, "main_loop", 4096, NULL, 12, NULL, 0);
+
+    //while (1) 
+    //{
+	//	vTaskDelay(1000 / portTICK_PERIOD_MS);
+    //}
 }

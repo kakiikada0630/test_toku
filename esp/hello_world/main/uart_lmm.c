@@ -87,6 +87,8 @@ uint32_t recv_uart(uint8_t* p_rec, uint32_t size)
 		ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_2	, (size_t*)&length2));
 	}while( length != length2 );
 
+	length = ( length > size )? size : length;
+
 	length = uart_read_bytes(UART_NUM_2, p_rec, length, portMAX_DELAY);
 	
 	return length;

@@ -64,6 +64,11 @@ COM_NAME = b"\\\.\COM7"
 #-----------------------------------
 
 
+vbu_state = 0
+ig1_state = 0
+turn_state = 0
+hlbkup_state = 0
+
 def time_count():
     param = PARAM()
 
@@ -135,6 +140,62 @@ def cmd_exe():
     #print( moji )
     DebufApl.WriteCmd(moji)
 
+def cmd_fukkatsu():
+    moji = b"bin on " + b'\n'
+    DebufApl.WriteCmd(moji)
+
+def cmd_vbu():
+    global vbu_state
+    global Btn_Vbu
+    if 0 == vbu_state:
+        moji = b"vbu on " + b'\n'
+        DebufApl.WriteCmd(moji)
+        vbu_state = 1
+        Btn_Vbu.config( text="VBU on",bg="skyblue")
+    else:
+        moji = b"vbu off " + b'\n'
+        DebufApl.WriteCmd(moji)
+        vbu_state = 0
+        Btn_Vbu.config( text="VBU off",bg="SystemButtonFace")
+
+def cmd_ig1():
+    global ig1_state
+    if 0 == ig1_state:
+        moji = b"ig1 on " + b'\n'
+        DebufApl.WriteCmd(moji)
+        ig1_state = 1
+        Btn_Ig1.config( text="IG1 on",bg="skyblue")
+    else:
+        moji = b"ig1 off " + b'\n'
+        DebufApl.WriteCmd(moji)
+        ig1_state = 0
+        Btn_Ig1.config( text="IG1 off",bg="SystemButtonFace")
+
+def cmd_turn():
+    global turn_state
+    if 0 == turn_state:
+        moji = b"turn on " + b'\n'
+        DebufApl.WriteCmd(moji)
+        turn_state = 1
+        Btn_Turn.config( text="Turn on",bg="skyblue")
+    else:
+        moji = b"turn off " + b'\n'
+        DebufApl.WriteCmd(moji)
+        turn_state = 0
+        Btn_Turn.config( text="Turn off",bg="SystemButtonFace")
+
+def cmd_hlbkup():
+    global hlbkup_state
+    if 0 == hlbkup_state:
+        moji = b"hlbkup on " + b'\n'
+        DebufApl.WriteCmd(moji)
+        hlbkup_state = 1
+        Btn_Hlbkup.config( text="H/L Bkup on",bg="skyblue")
+    else:
+        moji = b"hlbkup off " + b'\n'
+        DebufApl.WriteCmd(moji)
+        hlbkup_state = 0
+        Btn_Hlbkup.config( text="H/L Bkup off",bg="SystemButtonFace")
 
 
 frame=1
@@ -154,8 +215,8 @@ DebufApl.FileOpen  (b"Python")
 #---------------------------------------------------
 # 温度関連
 #---------------------------------------------------
-Btn_LCMDec =tk.Button(root,text="LCM温度(℃)",command=lcm_dec, state='disabled').grid(row=0, column=0)
-txt_LCMDec = tk.Entry(text=b'LCM_DEC',width=10, state='disabled')
+Btn_LCMDec =tk.Button(root,text="LCM温度(℃)",command=lcm_dec).grid(row=0, column=0)
+txt_LCMDec = tk.Entry(text=b'LCM_DEC',width=10)
 txt_LCMDec.grid(row=0, column=1)
 txt_LCMDec.insert(tk.END,"30")
 lbl_LCMDec_val = tk.Label(text=b'test',width=10,anchor="w")
@@ -378,7 +439,18 @@ lbl_Cmd4.grid(row=24, column=0)
 lbl_Cmd5 = tk.Label(text='echo コメント ',width=15,anchor="w")
 lbl_Cmd5.grid(row=25, column=0)
 
+# 復活の呪文
+Btn_Fukkatsu =tk.Button(root,text="復活の呪文",command=cmd_fukkatsu).grid(row=20, column=3)
 
+# その他ボタン
+Btn_Vbu      =tk.Button(root,text="VBU off"       ,command=cmd_vbu)
+Btn_Vbu.grid(row=21, column=3)
+Btn_Ig1      =tk.Button(root,text="IG1 off"       ,command=cmd_ig1)
+Btn_Ig1.grid(row=21, column=4)
+Btn_Turn      =tk.Button(root,text="Turn off"       ,command=cmd_turn)
+Btn_Turn.grid(row=22, column=3)
+Btn_Hlbkup    =tk.Button(root,text="H/L Bkup off"       ,command=cmd_hlbkup)
+Btn_Hlbkup.grid(row=22, column=4)
 #---------------------------------------------------
 thread = threading.Thread(target=time_count)
 thread.start()

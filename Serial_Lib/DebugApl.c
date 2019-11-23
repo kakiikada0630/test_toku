@@ -471,12 +471,7 @@ DLLAPI void OpenSerial(char* com_name)
 
 	// 基板側の起動
 	Sleep(100);
-	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
-	Sleep(100);
-	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
-	Sleep(100);
 	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
-
 	// スレッド処理実行開始
 	sys_t.thread_active = TRUE;
 	sys_t.thread_handle = CreateThread(NULL,0,execute_thread,NULL,0,&sys_t.thread_id);
@@ -488,12 +483,7 @@ DLLAPI void CloseSerial()
 
 	// 基板側のシャットダウン
 	Sleep(100);
-	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
-	Sleep(100);
-	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
-	Sleep(100);
-	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
-
+	serial_send(sys_t.obj,"vbu off\n",sizeof("bin on\n"));
 	// スレッド処理実行終了
 	sys_t.file_open = FALSE;
 	Sleep(100);
@@ -594,11 +584,11 @@ int main (int argc, char *argv[])
 	}
 
 	Sleep(100);
-	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+	serial_send(sys_t.obj,"bin off\n",sizeof("bin on\n"));
 	Sleep(100);
-	serial_send(sys_t.obj,"ig1 on\n",sizeof("bin on\n"));
+	serial_send(sys_t.obj,"ig1 off\n",sizeof("bin on\n"));
 	Sleep(100);
-	serial_send(sys_t.obj,"vbu on\n",sizeof("bin on\n"));
+	serial_send(sys_t.obj,"vbu off\n",sizeof("bin on\n"));
 
 	FileCloseInt();
 	serial_delete(sys_t.obj);
