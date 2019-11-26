@@ -426,6 +426,7 @@ DWORD WINAPI execute_thread(LPVOID param)
 		}
 
 		memset(buf, 0, sizeof(buf));
+		memset(&PARAM, 0, sizeof(struct Parameter));
 		len = serial_recv_block(sys_t.obj,buf,sizeof(buf));
 		if (len){
 			Analize ( buf, len, &PARAM );
@@ -565,6 +566,7 @@ int main (int argc, char *argv[])
 
 	while (1) {
 		memset(buf, 0, sizeof(buf));
+		memset(&PARAM, 0, sizeof(struct Parameter));
 		len = serial_recv_block(sys_t.obj,buf,sizeof(buf));
 		if (len){
 			//printf("[%5d]\n",len); 

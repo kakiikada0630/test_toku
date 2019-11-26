@@ -9,6 +9,10 @@
 #define DLLAPI __declspec(dllimport)
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct Parameter
 {
 	int TICK          ;  // % * 100
@@ -63,5 +67,9 @@ DLLAPI void CloseSerial();
 DLLAPI void WriteCmd( char* cmd );
 
 DLLAPI void GetParam( struct Parameter *param );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
