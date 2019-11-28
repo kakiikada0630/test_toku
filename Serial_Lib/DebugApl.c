@@ -74,6 +74,7 @@ void Analize_SPI( unsigned char* buf, int size, struct Parameter *param )
 	//--------------------------------------------------
 	//Boostへの命令の検索
 	//--------------------------------------------------
+	unsigned int   boost_vol  = 0;
 	for(int i=0 ; i<BST_CMD_SIZE ; i++)
 	{
 		unsigned short address;
@@ -88,11 +89,13 @@ void Analize_SPI( unsigned char* buf, int size, struct Parameter *param )
 			#define VOL_DIFF 53300  // (64.8 -11.5)*1000  ※単位をmVに修正
 			short BoostVsetpoint = data & 0x007f;
 			
-			param->BOOST_VOL = VOL_DIFF*BoostVsetpoint/VAL_DIFF + 22;  // レジスタ値(BoostVsetpoint)から電圧を計算
+			boost_vol = VOL_DIFF*BoostVsetpoint/VAL_DIFF + 22;  // レジスタ値(BoostVsetpoint)から電圧を計算
 			break;
 		}
 		buf16++;
 	}
+
+	param->BOOST_VOL = boost_vol;
 
 	//--------------------------------------------------
 	//Buck(StringA/B)への命令の検索
@@ -426,7 +429,6 @@ DWORD WINAPI execute_thread(LPVOID param)
 		}
 
 		memset(buf, 0, sizeof(buf));
-		memset(&PARAM, 0, sizeof(struct Parameter));
 		len = serial_recv_block(sys_t.obj,buf,sizeof(buf));
 		if (len){
 			Analize ( buf, len, &PARAM );
