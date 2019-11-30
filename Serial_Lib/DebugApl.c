@@ -408,10 +408,10 @@ void FileOpenInt()
 
 void FileCloseInt()
 {
-	fclose(sys_t.output_org     );
+	if( NULL != sys_t.output_org ){fclose(sys_t.output_org     );}
 	sys_t.output_org = NULL;
 	
-	fclose(sys_t.output_analized);
+	if( NULL != sys_t.output_analized){fclose(sys_t.output_analized);}
 	sys_t.output_analized = NULL;
 }
 
@@ -444,7 +444,7 @@ DWORD WINAPI execute_thread(LPVOID param)
 		}
 		else
 		{
-			Sleep(4);
+			Sleep(1);
 		}
 		
 		if( FALSE == sys_t.file_open )
@@ -506,17 +506,25 @@ DLLAPI void CloseSerial()
 	// スレッド処理実行終了
 	sys_t.file_open = FALSE;
 	Sleep(100);
-	sys_t.thread_active = FALSE;
-	do {
-		Sleep(1);
-		GetExitCodeThread(sys_t.thread_handle,&thread_state);
-	} while (thread_state == STILL_ACTIVE);
+	
+	if( TRUE == sys_t.thread_active )
+	{
+		sys_t.thread_active = FALSE;
+		do {
+			Sleep(1);
+			GetExitCodeThread(sys_t.thread_handle,&thread_state);
+		} while (thread_state == STILL_ACTIVE);
 
-	DeleteCriticalSection(&sys_t.cs_data_get);
-	sys_t.data_get = FALSE;
+		DeleteCriticalSection(&sys_t.cs_data_get);
+		sys_t.data_get = FALSE;
+	}
 
 	// シリアル処理の終了
-	serial_delete(sys_t.obj);
+	if(sys_t.obj != NULL)
+	{
+		serial_delete(sys_t.obj);
+		sys_t.obj = NULL;
+	}
 }
 
 DLLAPI void WriteCmd( char* cmd )
