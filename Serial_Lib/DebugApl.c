@@ -11,6 +11,7 @@
 
 struct Parameter PARAM;
 
+
 typedef struct _TAG_SYSCTRL
 {
 #define FILE_LABEL_SIZE 100
@@ -31,6 +32,8 @@ typedef struct _TAG_SYSCTRL
 } sysctrl_t;
 
 static sysctrl_t sys_t={0};
+FILE *log_file;
+
 
 void Analize_PWM( unsigned char* buf, int size, struct Parameter *param )
 {
@@ -448,7 +451,7 @@ DWORD WINAPI execute_thread(LPVOID param)
 		{
 			if( (NULL != sys_t.output_org) || (NULL != sys_t.output_analized) )
 			{
-				FileOpenInt();
+				FileCloseInt();
 			}
 		}
 	}
@@ -464,9 +467,16 @@ DWORD WINAPI execute_thread(LPVOID param)
 //---------------------------------------------------
 DLLAPI void OpenSerial(char* com_name)
 {
+	//------- 動作ログ用 -------
+	char log_fname[256]     ="LOG_FILE.txt";
+
+	if( log_file == NULL ) { log_file = fopen(log_fname, "w"); }
+	if( log_file != NULL ) { fprintf( log_file, "[%s] COM=%s\n", __func__, com_name ); }
+	//------- 動作ログ用 -------
+
 	sys_t.obj = serial_create(com_name,921600);
 	if ( sys_t.obj == NULL ) {
-		fprintf(stderr,"オブジェクト生成に失敗");
+		if( log_file != NULL ) { fprintf(log_file,"[%s][err]オブジェクト生成に失敗\n", __func__);}
 		return;
 	}
 	
@@ -475,6 +485,7 @@ DLLAPI void OpenSerial(char* com_name)
 	// 基板側の起動
 	Sleep(100);
 	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+	if( log_file != NULL ) { fprintf( log_file, "[%s] serial_send=%s\n", __func__, "bin on\\n" ); }
 	// スレッド処理実行開始
 	sys_t.thread_active = TRUE;
 	sys_t.thread_handle = CreateThread(NULL,0,execute_thread,NULL,0,&sys_t.thread_id);
@@ -482,11 +493,16 @@ DLLAPI void OpenSerial(char* com_name)
 
 DLLAPI void CloseSerial()
 {
+	//------- 動作ログ用 -------
+	if( log_file  != NULL ) { fprintf( log_file, "[%s]\n", __func__ ); }
+	if( sys_t.obj == NULL ) 
+	{
+		if( log_file  != NULL ) { fprintf( log_file, "[%s][err] シリアルポートがOPENしてません。\n", __func__); return; }
+	}
+	//------- 動作ログ用 -------
+
 	DWORD thread_state;
 
-	// 基板側のシャットダウン
-	Sleep(100);
-	serial_send(sys_t.obj,"vbu off\n",sizeof("bin on\n"));
 	// スレッド処理実行終了
 	sys_t.file_open = FALSE;
 	Sleep(100);
@@ -505,12 +521,23 @@ DLLAPI void CloseSerial()
 
 DLLAPI void WriteCmd( char* cmd )
 {
+	//------- 動作ログ用 -------
+	if( log_file  != NULL ) { fprintf( log_file, "[%s] cmd=%s\n", __func__, cmd);                      }
+	if( sys_t.obj == NULL ) 
+	{
+		if( log_file != NULL ) { fprintf( log_file, "[%s][err] シリアルポートがOPENしてません。\n", __func__); return; }
+	}
+	//------- 動作ログ用 -------
+
 	serial_send(sys_t.obj,cmd,strlen(cmd));
 	//printf("%d: %s",strlen(cmd), cmd);
 }
 
 DLLAPI void FileOpen( char *plabel )
 {
+	//------- 動作ログ用 -------
+	if( log_file  != NULL ) { fprintf( log_file, "[%s] label=%s\n", __func__, plabel); }
+	//------- 動作ログ用 -------
 	memset(sys_t.label, 0, FILE_LABEL_SIZE);
 	sprintf(sys_t.label, "%s", plabel);
 	sys_t.file_open = TRUE;
@@ -518,6 +545,9 @@ DLLAPI void FileOpen( char *plabel )
 
 DLLAPI void FileClose()
 {
+	//------- 動作ログ用 -------
+	if( log_file != NULL ) { fprintf( log_file, "[%s]\n", __func__); }
+	//------- 動作ログ用 -------
 	sys_t.file_open = FALSE;
 }
 
