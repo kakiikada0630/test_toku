@@ -12,6 +12,7 @@
 #include "freertos/task.h"
 #include "driver/uart.h"
 #include "pin_assign.h"
+#include "uart_lmm.h"
 
 #define BUF_SIZE (200)
 
@@ -66,6 +67,11 @@ void init_uart()
 
     ESP_ERROR_CHECK(uart_driver_install(UART_NUM_2, BUF_SIZE*2, 0, 0, NULL, 0));
     data = (uint8_t *) malloc(BUF_SIZE);
+}
+
+void set_uart_baudrate(uint32_t baud)
+{
+	uart_set_baudrate( UART_NUM_2, baud );
 }
 
 void send_uart()

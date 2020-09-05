@@ -28,6 +28,11 @@
 #define UART_TX_PIN         -1
 #define UART_RX_PIN         GPIO_NUM_16
 
+//#define LIN_RX_PIN        GPIO_NUM_17
+#define LIN_TX_PIN         -1
+#define LIN_RX_PIN         GPIO_NUM_17
+
+
 //LEDŒv‘ª—pƒsƒ“
 #define GPIO_A1             GPIO_NUM_2
 #define GPIO_A2             GPIO_NUM_4

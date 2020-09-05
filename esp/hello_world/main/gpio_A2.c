@@ -31,7 +31,6 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 		int32_t bunsi = ( int32_t )(end_one_time - end_zero_time);
 		int32_t bunbo = ( int32_t )(end_one_time - start_time   );
 		per = bunsi*10000 / bunbo;
-		per = 10000-per;
 		start_time   = end_one_time;
 	}
 	else

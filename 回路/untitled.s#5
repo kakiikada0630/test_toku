@@ -9525,6 +9525,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="JP57" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="JP58" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="JP60" library="pinhead" deviceset="PINHD-1X3" device=""/>
+<part name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
 </parts>
 <sheets>
 <sheet>
@@ -9535,7 +9536,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <text x="-170.18" y="83.82" size="1.778" layer="91">VBoost</text>
 <text x="-193.04" y="83.82" size="1.778" layer="91">5Vb</text>
 <text x="-71.12" y="106.68" size="1.778" layer="91">5Va</text>
-<text x="-180.34" y="-106.68" size="1.778" layer="91">5Va</text>
+<text x="-180.34" y="-106.68" size="1.778" layer="91">USB_5V</text>
 <text x="-152.4" y="86.36" size="1.778" layer="91">Bck1 UDIM1</text>
 <text x="-132.08" y="86.36" size="1.778" layer="91">Bck1 UDIM2</text>
 <text x="-132.08" y="55.88" size="1.778" layer="91">Bck2 UDIM2</text>
@@ -9560,6 +9561,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <text x="-78.74" y="-147.32" size="1.778" layer="91">Turn Sync SW</text>
 <text x="-78.74" y="-144.78" size="1.778" layer="91">SPI_MOSI</text>
 <text x="-78.74" y="-149.86" size="1.778" layer="91">SPI_SCK</text>
+<text x="-177.8" y="-76.2" size="1.778" layer="91">5Va</text>
 </plain>
 <instances>
 <instance part="JP1" gate="A" x="35.56" y="71.12"/>
@@ -9799,6 +9801,10 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <instance part="JP57" gate="A" x="17.78" y="-195.58"/>
 <instance part="JP58" gate="A" x="25.4" y="-195.58"/>
 <instance part="JP60" gate="A" x="33.02" y="-195.58"/>
+<instance part="R11" gate="G$1" x="-175.26" y="-86.36" smashed="yes" rot="R90">
+<attribute name="NAME" x="-176.7586" y="-90.17" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-171.958" y="-87.63" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -10816,9 +10822,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-190.5" y1="53.34" x2="-190.5" y2="55.88" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="VDD"/>
-<wire x1="-167.64" y1="-111.76" x2="-177.8" y2="-111.76" width="0.1524" layer="91"/>
-<wire x1="-177.8" y1="-111.76" x2="-177.8" y2="-106.68" width="0.1524" layer="91"/>
+<pinref part="R11" gate="G$1" pin="2"/>
+<wire x1="-175.26" y1="-81.28" x2="-175.26" y2="-76.2" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="5VB" class="0">
@@ -10894,6 +10899,9 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-182.88" y1="-96.52" x2="-182.88" y2="-86.36" width="0.1524" layer="91"/>
 <pinref part="D1" gate="G$1" pin="A"/>
 <wire x1="-182.88" y1="-86.36" x2="-187.96" y2="-86.36" width="0.1524" layer="91"/>
+<pinref part="R11" gate="G$1" pin="1"/>
+<wire x1="-175.26" y1="-91.44" x2="-175.26" y2="-96.52" width="0.1524" layer="91"/>
+<wire x1="-175.26" y1="-96.52" x2="-182.88" y2="-96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="ESP32_TURN_SYNC" class="0">
@@ -10910,11 +10918,16 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="-86.36" y1="-147.32" x2="-81.28" y2="-147.32" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="USB_5V" class="0">
 <segment>
 <pinref part="JP14" gate="A" pin="1"/>
 <pinref part="JP15" gate="A" pin="1"/>
 <wire x1="-111.76" y1="-139.7" x2="-101.6" y2="-139.7" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="VDD"/>
+<wire x1="-167.64" y1="-111.76" x2="-177.8" y2="-111.76" width="0.1524" layer="91"/>
+<wire x1="-177.8" y1="-111.76" x2="-177.8" y2="-106.68" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$48" class="0">

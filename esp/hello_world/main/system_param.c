@@ -2,6 +2,7 @@
 
 static uint32_t g_PWM_LOG   = 0;   // 0=無効, 1=有効
 static uint32_t g_UART_LOG  = 0;   // 0=無効, 1=有効
+static uint32_t g_LIN_LOG   = 0;   // 0=無効, 1=有効
 static uint32_t g_SPI_LOG   = 0;   // 0=無効, 1=有効
 static uint32_t g_BIN_LOG   = 0;   // 0=無効, 1=有効
 
@@ -40,6 +41,22 @@ void     set_uart_log_onoff( uint32_t val )
 		g_BIN_LOG = 0;
 	}
 	g_UART_LOG = val;
+}
+
+//--------------------------
+// LINログの設定
+uint32_t get_lin_log_onoff()
+{
+	return g_LIN_LOG;
+}
+
+void     set_lin_log_onoff( uint32_t val )
+{
+	if(1 == val)
+	{
+		g_BIN_LOG = 0;
+	}
+	g_LIN_LOG = val;
 }
 
 //--------------------------

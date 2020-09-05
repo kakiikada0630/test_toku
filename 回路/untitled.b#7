@@ -5123,6 +5123,12 @@ design rules under a new name.</description>
 <wire x1="79.0275" y1="73.245" x2="78.9975" y2="73.215" width="0.1524" layer="1"/>
 <wire x1="78.9975" y1="73.215" x2="69.39" y2="73.215" width="0.1524" layer="1"/>
 </signal>
+<signal name="N$113">
+<contactref element="JP10" pad="15"/>
+</signal>
+<signal name="N$5">
+<contactref element="JP10" pad="14"/>
+</signal>
 </signals>
 </board>
 </drawing>

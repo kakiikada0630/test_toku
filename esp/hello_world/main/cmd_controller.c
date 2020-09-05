@@ -14,6 +14,9 @@
 #include "pin_assign.h"
 #include "system_param.h"
 #include "i2c_server.h"
+#include "uart_lmm.h"
+#include "uart_lin.h"
+
 
 #define DEC2DAC_TABLE_SIZE  195
 
@@ -305,7 +308,7 @@ static inline void CMD_SPI_LOG( const char* op1 )
 	else{}
 }
 
-static inline void CMD_UART_LOG( const char* op1 )
+static inline void CMD_UART_LOG( const char* op1, const char* op2 )
 {
 	if( 0 == memcmp(op1, "on", 2 ) )
 	{
@@ -314,6 +317,29 @@ static inline void CMD_UART_LOG( const char* op1 )
 	else if( 0 == memcmp(op1, "off", 3 ) )
 	{
 		set_uart_log_onoff( 0 );
+	}
+	else if( 0 == memcmp(op1, "baud", 4 ) )
+	{
+		uint32_t boud_rate = atoi(op2);
+		set_uart_baudrate( boud_rate );
+	}
+	else{}
+}
+
+static inline void CMD_LIN_LOG( const char* op1, const char* op2 )
+{
+	if( 0 == memcmp(op1, "on", 2 ) )
+	{
+		set_lin_log_onoff( 1 );
+	}
+	else if( 0 == memcmp(op1, "off", 3 ) )
+	{
+		set_lin_log_onoff( 0 );
+	}
+	else if( 0 == memcmp(op1, "baud", 4 ) )
+	{
+		uint32_t boud_rate = atoi(op2);
+		set_lin_baudrate( boud_rate );
 	}
 	else{}
 }
@@ -437,7 +463,11 @@ void exec_cmd()
 			}
 			else if( 0 == memcmp(cmd_buf, "uart", 4 ) )
 			{
-				CMD_UART_LOG( option1 );
+				CMD_UART_LOG( option1, option2 );
+			}
+			else if( 0 == memcmp(cmd_buf, "lin", 4 ) )
+			{
+				CMD_LIN_LOG( option1, option2 );
 			}
 			else if( 0 == memcmp(cmd_buf, "dac", 3 ) )
 			{
@@ -462,7 +492,8 @@ void exec_cmd()
 				sprintf( cmd ,"\n*** ÉçÉO ***          \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"pwm    [on/off]         \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"spi    [on/off]         \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
-				sprintf( cmd ,"uart   [on/off]         \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+				sprintf( cmd ,"uart   [on/off/baud] [rate] \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+				sprintf( cmd ,"lin    [on/off/baud] [rate] \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"dac    [ch] [íl(0-4095)]\n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"\n*** ÇªÇÃëº ***        \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"echo   [ï∂éöóÒ]         \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );

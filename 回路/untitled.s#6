@@ -9423,12 +9423,12 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="BUCK1_2" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="CHIP-LED0603"/>
 <part name="BUCK2_1" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="CHIP-LED0603"/>
 <part name="BUCK_2_2" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="CHIP-LED0603"/>
-<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
-<part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
-<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
-<part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
-<part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
-<part name="R6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100"/>
+<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
+<part name="R6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="1k"/>
 <part name="R7" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="4.7k"/>
 <part name="R8" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="4.7k"/>
 <part name="R9" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="4.7k"/>
@@ -9738,9 +9738,9 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <instance part="SUPPLY14" gate="GND" x="-58.42" y="81.28"/>
 <instance part="R19" gate="G$1" x="-50.8" y="83.82"/>
 <instance part="SUPPLY15" gate="GND" x="-116.84" y="-114.3"/>
-<instance part="D1" gate="G$1" x="-190.5" y="-91.44"/>
-<instance part="D2" gate="G$1" x="-190.5" y="-96.52"/>
-<instance part="D3" gate="G$1" x="-190.5" y="-101.6"/>
+<instance part="D1" gate="G$1" x="-190.5" y="-86.36" rot="R180"/>
+<instance part="D2" gate="G$1" x="-190.5" y="-96.52" rot="R180"/>
+<instance part="D3" gate="G$1" x="-190.5" y="-101.6" rot="R180"/>
 <instance part="JP10" gate="A" x="-157.48" y="-157.48"/>
 <instance part="JP11" gate="A" x="-144.78" y="-157.48"/>
 <instance part="JP12" gate="A" x="-132.08" y="-157.48"/>
@@ -10035,8 +10035,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <junction x="63.5" y="66.04"/>
 </segment>
 <segment>
-<pinref part="D3" gate="G$1" pin="A"/>
-<wire x1="-198.12" y1="-101.6" x2="-193.04" y2="-101.6" width="0.1524" layer="91"/>
+<pinref part="D3" gate="G$1" pin="C"/>
+<wire x1="-193.04" y1="-101.6" x2="-198.12" y2="-101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SPI_CS_BK1" class="0">
@@ -10049,8 +10049,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <junction x="71.12" y="63.5"/>
 </segment>
 <segment>
-<pinref part="D1" gate="G$1" pin="A"/>
-<wire x1="-193.04" y1="-91.44" x2="-198.12" y2="-91.44" width="0.1524" layer="91"/>
+<pinref part="D1" gate="G$1" pin="C"/>
+<wire x1="-193.04" y1="-86.36" x2="-198.12" y2="-86.36" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SPI_MOSI" class="0">
@@ -10115,7 +10115,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <junction x="12.7" y="63.5"/>
 </segment>
 <segment>
-<pinref part="D2" gate="G$1" pin="A"/>
+<pinref part="D2" gate="G$1" pin="C"/>
 <wire x1="-193.04" y1="-96.52" x2="-198.12" y2="-96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -10881,19 +10881,19 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </net>
 <net name="ESP32_SPI_CS" class="0">
 <segment>
-<pinref part="D1" gate="G$1" pin="C"/>
-<wire x1="-187.96" y1="-91.44" x2="-182.88" y2="-91.44" width="0.1524" layer="91"/>
-<pinref part="D2" gate="G$1" pin="C"/>
-<wire x1="-187.96" y1="-96.52" x2="-182.88" y2="-96.52" width="0.1524" layer="91"/>
-<wire x1="-182.88" y1="-96.52" x2="-182.88" y2="-91.44" width="0.1524" layer="91"/>
-<pinref part="D3" gate="G$1" pin="C"/>
-<wire x1="-187.96" y1="-101.6" x2="-182.88" y2="-101.6" width="0.1524" layer="91"/>
-<wire x1="-182.88" y1="-101.6" x2="-182.88" y2="-96.52" width="0.1524" layer="91"/>
-<junction x="-182.88" y="-96.52"/>
-<wire x1="-182.88" y1="-101.6" x2="-182.88" y2="-144.78" width="0.1524" layer="91"/>
-<junction x="-182.88" y="-101.6"/>
 <pinref part="JP10" gate="A" pin="3"/>
+<wire x1="-182.88" y1="-96.52" x2="-182.88" y2="-101.6" width="0.1524" layer="91"/>
+<wire x1="-182.88" y1="-101.6" x2="-182.88" y2="-144.78" width="0.1524" layer="91"/>
 <wire x1="-182.88" y1="-144.78" x2="-160.02" y2="-144.78" width="0.1524" layer="91"/>
+<pinref part="D3" gate="G$1" pin="A"/>
+<wire x1="-182.88" y1="-101.6" x2="-187.96" y2="-101.6" width="0.1524" layer="91"/>
+<junction x="-182.88" y="-101.6"/>
+<pinref part="D2" gate="G$1" pin="A"/>
+<wire x1="-182.88" y1="-96.52" x2="-187.96" y2="-96.52" width="0.1524" layer="91"/>
+<junction x="-182.88" y="-96.52"/>
+<wire x1="-182.88" y1="-96.52" x2="-182.88" y2="-86.36" width="0.1524" layer="91"/>
+<pinref part="D1" gate="G$1" pin="A"/>
+<wire x1="-182.88" y1="-86.36" x2="-187.96" y2="-86.36" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="ESP32_TURN_SYNC" class="0">

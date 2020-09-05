@@ -310,26 +310,75 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	//-----------------------------------------
 	//ログをそのまま書き出し
 	//-----------------------------------------
-	unsigned char out[2000]={0};
-	unsigned char *buf8 = buf+BLOCK_PWM;
+	unsigned char  data[2000]={0};
+	unsigned char  *out= data;
+	unsigned char  *buf8  = 0;
+	unsigned short *buf16 = (unsigned short*)(buf+BLOCK_PWM);
+	unsigned int   loop   = 0;
 
 	if( (sys_t.output_org == NULL) || (sys_t.output_analized == NULL) )
 	{
 		return;
 	}
 
-	fprintf(sys_t.output_org,"[%7d]",param->TICK );
+	fprintf(sys_t.output_org,"[%7d],",param->TICK );
 
-	for( int i=0 ; i<BLOCK_SIZE-BLOCK_PWM ; i++ )
+	// PWM出力
+	loop = ( BLOCK_SPI - BLOCK_PWM )/ 2;
+	for( int i=0 ; i<loop  ; i++ )
+	{
+		sprintf( out+i*6, "%04x, ", *(buf16+i) );
+	}
+	out += loop*6; // PWM領域分のアドレスを進める
+
+	// SPI
+	loop = ( BLOCK_UART - BLOCK_SPI );
+	buf8 = buf + BLOCK_SPI;
+	
+	for( int i=0 ; i<loop  ; i++ )
 	{
 		sprintf( out+i*2, "%02x", *(buf8+i) );
 	}
+	out += loop*2;
+	sprintf( out, " ,");
+	out+=2;
 
-	fprintf(sys_t.output_org,"%s\n",out );
+	// UART
+	loop = ( BLOCK_LIN - BLOCK_UART );
+	buf8 = buf + BLOCK_UART;
+	for( int i=0 ; i<loop  ; i++ )
+	{
+		sprintf( out+i*2, "%02x", *(buf8+i) );
+	}
+	out += loop*2;
+	sprintf( out, " ,");
+	out+=2;
+
+	// LIN
+	loop = ( BLOCK_DAC - BLOCK_LIN );
+	buf8 = buf + BLOCK_LIN;
+	for( int i=0 ; i<loop  ; i++ )
+	{
+		sprintf( out+i*2, "%02x", *(buf8+i) );
+	}
+	out += loop*2;
+	sprintf( out, " ,");
+	out+=2;
+
+	// DAC
+	loop = ( BLOCK_SIZE - BLOCK_DAC )/2;
+	buf16 = (unsigned short*)(buf + BLOCK_DAC);
+	for( int i=0 ; i<loop  ; i++ )
+	{
+		sprintf( out+i*6, "%04x, ", *(buf16+i) );
+	}
+
+	fprintf(sys_t.output_org,"%s\n",data );
 
 	//-----------------------------------------
 	//解析後の数値を書き出し
 	//-----------------------------------------
+	out= data;
 	fprintf(sys_t.output_analized,"[%7d],",param->TICK );
 	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 					param->PWM_A1       ,
@@ -369,7 +418,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 					param->DAC_LED1     ,
 					param->DAC_LED2     ,
 					param->DAC_LED3     );
-		fprintf(sys_t.output_analized,"%s",out);
+		fprintf(sys_t.output_analized,"%s",data);
 
 	//-----------------------------------------
 }
@@ -380,6 +429,7 @@ void FileOpenInt()
 	// ファイル出力設定
 	char org_fname[256]     ={0};
 	char analized_fname[256]={0};
+	unsigned char out[300]={0};
 	
 	sprintf( org_fname     , "%s_org.csv", sys_t.label );
 	sprintf( analized_fname, "%s_ana.csv", sys_t.label );
@@ -397,13 +447,16 @@ void FileOpenInt()
 		sys_t.output_org = NULL;
 		return;                            // 異常終了
 	}
+	sprintf( out, "[Tick(ms)],Discharge,A1,A2,B1,B2,B3,UDIM21,UDIM22,-,-,-,-,-,-,SPI,UART,LIN,lcm_Dec,led_Dec1,led_Dec2,led_Dec3,led_Dec4,-\n");
+	fprintf(sys_t.output_org,"%s",out);
 	
-	unsigned char out[300]={0};
+
 	fprintf(sys_t.output_analized,"BoostVol=(mV)\n",out);
 	fprintf(sys_t.output_analized,"x_CUR=(mA)\n",out);
 	fprintf(sys_t.output_analized,"xx_PWM=(0.01%/LSB)\n",out);
 	fprintf(sys_t.output_analized,"DAC_xxx=(℃)\n",out);
-	sprintf( out, "[Tick(ms)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");	fprintf(sys_t.output_analized,"%s",out);
+	sprintf( out, "[Tick(ms)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");
+	fprintf(sys_t.output_analized,"%s",out);
 }
 
 void FileCloseInt()

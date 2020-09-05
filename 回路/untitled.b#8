@@ -3144,6 +3144,7 @@ design rules under a new name.</description>
 <element name="JP60" library="pinhead" package="1X03" value="" x="46.26" y="56.54" smashed="yes">
 <attribute name="VALUE" x="42.45" y="53.365" size="1.27" layer="27"/>
 </element>
+<element name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" value="100" x="61" y="74" rot="R270"/>
 </elements>
 <signals>
 <signal name="GND">
@@ -4407,7 +4408,6 @@ design rules under a new name.</description>
 <wire x1="34.695" y1="84.705" x2="34.59" y2="84.81" width="0.1524" layer="1"/>
 <wire x1="6.65" y1="84.81" x2="6.65" y2="84.6" width="0.1524" layer="16"/>
 <wire x1="6.65" y1="84.6" x2="3.005" y2="80.955" width="0.1524" layer="16"/>
-<contactref element="U$1" pad="P$1"/>
 <wire x1="44.75" y1="84.81" x2="45.185" y2="85.245" width="0.1524" layer="1"/>
 <wire x1="45.185" y1="85.245" x2="50.115" y2="84.245" width="0.1524" layer="1"/>
 <wire x1="50.115" y1="84.245" x2="51.215" y2="83.145" width="0.1524" layer="1"/>
@@ -4416,14 +4416,9 @@ design rules under a new name.</description>
 <wire x1="53.3275" y1="82.7875" x2="53.3275" y2="73.8875" width="0.1524" layer="1"/>
 <wire x1="53.3275" y1="73.8875" x2="55.225" y2="71.99" width="0.1524" layer="1"/>
 <wire x1="55.225" y1="71.99" x2="56.54" y2="71.99" width="0.1524" layer="1"/>
-<via x="62.3225" y="66.82" extent="1-16" drill="0.35"/>
-<via x="77.1" y="65.535" extent="1-16" drill="0.35"/>
-<wire x1="77.385" y1="62.695" x2="77.1" y2="62.98" width="0.1524" layer="16"/>
-<wire x1="77.1" y1="62.98" x2="77.1" y2="65.535" width="0.1524" layer="16"/>
-<wire x1="77.1" y1="65.535" x2="75.815" y2="66.82" width="0.1524" layer="1"/>
-<wire x1="75.815" y1="66.82" x2="62.3225" y2="66.82" width="0.1524" layer="1"/>
-<wire x1="57.1525" y1="71.99" x2="56.54" y2="71.99" width="0.1524" layer="16"/>
-<wire x1="62.3225" y1="66.82" x2="57.1525" y2="71.99" width="0.1524" layer="16"/>
+<contactref element="R11" pad="2"/>
+<wire x1="56.54" y1="71.99" x2="59.84" y2="71.99" width="0.1524" layer="1"/>
+<wire x1="59.84" y1="71.99" x2="61" y2="73.15" width="0.1524" layer="1"/>
 </signal>
 <signal name="5VB">
 <contactref element="5VB" pad="1"/>
@@ -4531,11 +4526,10 @@ design rules under a new name.</description>
 </signal>
 <signal name="ESP32_SPI_CS">
 <contactref element="JP10" pad="3"/>
-<wire x1="69.426290625" y1="83.411290625" x2="69.39" y2="83.375" width="0.1524" layer="1"/>
+<wire x1="69.39" y1="83.375" x2="69.426290625" y2="83.411290625" width="0.1524" layer="1"/>
 <contactref element="D3" pad="A"/>
 <contactref element="D2" pad="A"/>
 <contactref element="D1" pad="A"/>
-<wire x1="69.426290625" y1="83.411290625" x2="69.54" y2="83.525" width="0.1524" layer="1"/>
 <wire x1="72.545" y1="78.385" x2="72.545" y2="78.455" width="0.1524" layer="1"/>
 <wire x1="72.545" y1="78.455" x2="71" y2="80" width="0.1524" layer="1"/>
 <wire x1="71" y1="81.979575" x2="71" y2="80" width="0.1524" layer="1"/>
@@ -4546,6 +4540,13 @@ design rules under a new name.</description>
 <wire x1="72.024575" y1="80.955" x2="71" y2="81.979575" width="0.1524" layer="1"/>
 <wire x1="72.545" y1="83.525" x2="69.54" y2="83.525" width="0.1524" layer="1"/>
 <wire x1="69.54" y1="83.525" x2="69.426290625" y2="83.411290625" width="0.1524" layer="1"/>
+<contactref element="R11" pad="1"/>
+<wire x1="62.6273" y1="81.47124375" x2="62.6273" y2="81.6273" width="0.1524" layer="1"/>
+<wire x1="62.6273" y1="81.6273" x2="63" y2="82" width="0.1524" layer="1"/>
+<wire x1="61" y1="74.85" x2="61" y2="79.84394375" width="0.1524" layer="1"/>
+<wire x1="61" y1="79.84394375" x2="62.6273" y2="81.47124375" width="0.1524" layer="1"/>
+<wire x1="68.015" y1="82" x2="69.39" y2="83.375" width="0.1524" layer="1"/>
+<wire x1="63" y1="82" x2="68.015" y2="82" width="0.1524" layer="1"/>
 </signal>
 <signal name="ESP32_TURN_SYNC">
 <contactref element="Q7" pad="1"/>
@@ -4564,10 +4565,23 @@ design rules under a new name.</description>
 <wire x1="83.645" y1="80.835" x2="84.81" y2="80.835" width="0.1524" layer="1"/>
 <wire x1="63.6075" y1="84.81" x2="81.5975" y2="84.81" width="0.1524" layer="1"/>
 </signal>
-<signal name="N$5">
+<signal name="USB_5V">
 <contactref element="JP14" pad="1"/>
 <contactref element="JP15" pad="1"/>
 <wire x1="87.38" y1="88.455" x2="89.95" y2="88.455" width="0.1524" layer="1"/>
+<contactref element="U$1" pad="P$1"/>
+<wire x1="77.385" y1="62.695" x2="77.385" y2="63.615" width="0.1524" layer="16"/>
+<wire x1="77.385" y1="63.615" x2="77" y2="64" width="0.1524" layer="16"/>
+<wire x1="77" y1="64" x2="77" y2="73" width="0.1524" layer="16"/>
+<wire x1="77" y1="73" x2="80" y2="76" width="0.1524" layer="16"/>
+<wire x1="80" y1="76" x2="83.164075" y2="76" width="0.1524" layer="16"/>
+<wire x1="83.164075" y1="76" x2="84.399675" y2="74.7644" width="0.1524" layer="16"/>
+<wire x1="92" y1="76" x2="92" y2="87" width="0.1524" layer="16"/>
+<wire x1="84.399675" y1="74.7644" x2="90.7644" y2="74.7644" width="0.1524" layer="16"/>
+<wire x1="90.7644" y1="74.7644" x2="92" y2="76" width="0.1524" layer="16"/>
+<wire x1="92" y1="87" x2="91" y2="88" width="0.1524" layer="16"/>
+<wire x1="91" y1="88" x2="90.405" y2="88" width="0.1524" layer="16"/>
+<wire x1="90.405" y1="88" x2="89.95" y2="88.455" width="0.1524" layer="16"/>
 </signal>
 <signal name="N$48">
 <contactref element="JP14" pad="3"/>

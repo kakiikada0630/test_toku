@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.2.2">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
+<setting keepoldvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="1" unitdist="mm" unit="mm" style="dots" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -2359,10 +2360,14 @@ design rules under a new name.</description>
 <param name="slThermalsForVias" value="0"/>
 <param name="dpMaxLengthDifference" value="10mm"/>
 <param name="dpGapFactor" value="2.5"/>
-<param name="checkGrid" value="0"/>
 <param name="checkAngle" value="0"/>
 <param name="checkFont" value="1"/>
 <param name="checkRestrict" value="0"/>
+<param name="checkStop" value="0"/>
+<param name="checkValues" value="0"/>
+<param name="checkNames" value="1"/>
+<param name="checkWireStubs" value="1"/>
+<param name="checkPolygonWidth" value="0"/>
 <param name="useDiameter" value="13"/>
 <param name="maxErrors" value="50"/>
 </designrules>
@@ -2463,9 +2468,18 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="JP1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X10" value="" x="24.415" y="12.85" rot="MR0"/>
-<element name="JP2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X09" value="" x="53.97" y="12.85" rot="MR0"/>
-<element name="JP3" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X08" value="" x="80.955" y="12.85" rot="MR0"/>
+<element name="JP1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X10" value="" x="24.415" y="12.85" smashed="yes" rot="MR0">
+<attribute name="NAME" x="37.115" y="16.025" size="1.27" layer="26" ratio="10" rot="MR0"/>
+<attribute name="VALUE" x="37.115" y="8.405" size="1.27" layer="28" rot="MR0"/>
+</element>
+<element name="JP2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X09" value="" x="53.97" y="12.85" smashed="yes" rot="MR0">
+<attribute name="NAME" x="65.4" y="16.025" size="1.27" layer="26" ratio="10" rot="MR0"/>
+<attribute name="VALUE" x="65.4" y="8.405" size="1.27" layer="28" rot="MR0"/>
+</element>
+<element name="JP3" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="2X08" value="" x="80.955" y="12.85" smashed="yes" rot="MR0">
+<attribute name="NAME" x="91.115" y="16.025" size="1.27" layer="26" ratio="10" rot="MR0"/>
+<attribute name="VALUE" x="91.115" y="8.405" size="1.27" layer="28" rot="MR0"/>
+</element>
 <element name="1-2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="35.98" y="28.27" smashed="yes">
 <attribute name="NAME" x="35.9188" y="30.0988" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="34.71" y="25.095" size="1.27" layer="27"/>
@@ -2586,9 +2600,18 @@ design rules under a new name.</description>
 <attribute name="NAME" x="86.0338" y="22.3888" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="86.11" y="17.385" size="1.27" layer="27"/>
 </element>
-<element name="B2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="35.98"/>
-<element name="放電" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="20.56"/>
-<element name="A2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="35.98"/>
+<element name="B2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="35.98" smashed="yes">
+<attribute name="NAME" x="86.0338" y="37.8088" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="86.11" y="32.805" size="1.27" layer="27"/>
+</element>
+<element name="放電" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="20.56" smashed="yes">
+<attribute name="NAME" x="80.8938" y="22.3888" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="80.97" y="17.385" size="1.27" layer="27"/>
+</element>
+<element name="A2" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="35.98" smashed="yes">
+<attribute name="NAME" x="80.8938" y="37.8088" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="80.97" y="32.805" size="1.27" layer="27"/>
+</element>
 <element name="3-9" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="77.1" y="20.56" smashed="yes">
 <attribute name="NAME" x="75.7538" y="22.3888" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="75.83" y="17.385" size="1.27" layer="27"/>
@@ -2641,13 +2664,22 @@ design rules under a new name.</description>
 <attribute name="NAME" x="42.3438" y="30.0988" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="42.42" y="25.095" size="1.27" layer="27"/>
 </element>
-<element name="B3" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="28.27"/>
-<element name="B1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="43.69"/>
+<element name="B3" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="28.27" smashed="yes">
+<attribute name="NAME" x="86.0338" y="30.0988" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="86.11" y="25.095" size="1.27" layer="27"/>
+</element>
+<element name="B1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="87.38" y="43.69" smashed="yes">
+<attribute name="NAME" x="86.0338" y="45.5188" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="86.11" y="40.515" size="1.27" layer="27"/>
+</element>
 <element name="3-6" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="28.27" smashed="yes">
 <attribute name="NAME" x="80.8938" y="30.0988" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="80.97" y="25.095" size="1.27" layer="27"/>
 </element>
-<element name="A1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="43.69"/>
+<element name="A1" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="82.24" y="43.69" smashed="yes">
+<attribute name="NAME" x="80.8938" y="45.5188" size="1.27" layer="25" ratio="10"/>
+<attribute name="VALUE" x="80.97" y="40.515" size="1.27" layer="27"/>
+</element>
 <element name="3-10" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="77.1" y="28.27" smashed="yes">
 <attribute name="NAME" x="75.7538" y="30.0988" size="1.016" layer="25" ratio="10"/>
 <attribute name="VALUE" x="75.83" y="25.095" size="1.27" layer="27"/>
@@ -2832,16 +2864,28 @@ design rules under a new name.</description>
 <element name="3-32" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X01" value="" x="71.96" y="41.12" smashed="yes">
 <attribute name="VALUE" x="70.69" y="37.945" size="1.27" layer="27"/>
 </element>
-<element name="電源" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" value="" x="5.14" y="44.975" rot="R180"/>
+<element name="電源" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X02" value="" x="5.14" y="44.975" smashed="yes" rot="R180">
+<attribute name="NAME" x="7.7562" y="43.1462" size="1.27" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="7.68" y="48.15" size="1.27" layer="27" rot="R180"/>
+</element>
 <element name="IG1" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="6.425" y="38.55" smashed="yes" rot="R180">
 <attribute name="NAME" x="11.505" y="35.375" size="1.778" layer="25" rot="R180"/>
 </element>
 <element name="VBU" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="6.425" y="24.415" smashed="yes" rot="R180">
 <attribute name="NAME" x="11.505" y="21.24" size="1.778" layer="25" rot="R180"/>
 </element>
-<element name="JP63" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X04" value="" x="7.71" y="6.425" rot="R180"/>
-<element name="TURN" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="56.54" y="74.53" rot="R90"/>
-<element name="H/L" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="56.54" y="61.68" rot="R90"/>
+<element name="JP63" library="pinhead" library_urn="urn:adsk.eagle:library:325" package="1X04" value="" x="7.71" y="6.425" smashed="yes" rot="R180">
+<attribute name="NAME" x="12.8662" y="4.5962" size="1.27" layer="25" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="12.79" y="9.6" size="1.27" layer="27" rot="R180"/>
+</element>
+<element name="TURN" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="56.54" y="74.53" smashed="yes" rot="R90">
+<attribute name="NAME" x="53.365" y="69.45" size="1.778" layer="25" rot="R90"/>
+<attribute name="VALUE" x="61.62" y="69.45" size="1.778" layer="27" rot="R90"/>
+</element>
+<element name="H/L" library="switch" library_urn="urn:adsk.eagle:library:380" package="TL3XPO" value="TL39PO" x="56.54" y="61.68" smashed="yes" rot="R90">
+<attribute name="NAME" x="53.365" y="56.6" size="1.778" layer="25" rot="R90"/>
+<attribute name="VALUE" x="61.62" y="56.6" size="1.778" layer="27" rot="R90"/>
+</element>
 <element name="LED_5VB" library="led" library_urn="urn:adsk.eagle:library:259" package="CHIP-LED0603" value="" x="3.855" y="78.385" smashed="yes" rot="R90">
 <attribute name="NAME" x="5.775" y="77.75" size="0.8128" layer="25" rot="R180"/>
 <attribute name="VALUE" x="4.49" y="80.29" size="1.27" layer="27" rot="R180"/>
@@ -2973,7 +3017,7 @@ design rules under a new name.</description>
 <element name="R18" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" value="4.7k" x="56.54" y="48.83" smashed="yes">
 <attribute name="NAME" x="58.191" y="48.068" size="0.8128" layer="25"/>
 </element>
-<element name="U$1" library="MCP4728" package="MCP4728" value="MCP4728" x="78.385" y="60.395" rot="MR270"/>
+<element name="U$1" library="MCP4728" package="MCP4728" value="MCP4728" x="78.385" y="60.395" smashed="yes" rot="MR270"/>
 <element name="Q7" library="bss138_10" package="SOT23" value="BSS138" x="59.11" y="86.095" smashed="yes">
 <attribute name="MF" value="Fairchild" x="51.4" y="95.09" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="BSS138" x="51.4" y="95.09" size="1.778" layer="27" display="off"/>
@@ -2985,15 +3029,42 @@ design rules under a new name.</description>
 <element name="R19" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" value="4.7k" x="59.11" y="82.24" smashed="yes" rot="R180">
 <attribute name="NAME" x="60.888" y="81.097" size="0.8128" layer="25" rot="R180"/>
 </element>
-<element name="D1" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="83.525" rot="R180"/>
-<element name="D2" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="80.955" rot="R180"/>
-<element name="D3" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="78.385" rot="R180"/>
-<element name="JP10" library="pinhead" package="1X15" value="" x="69.39" y="70.675" rot="R270"/>
-<element name="JP11" library="pinhead" package="1X15" value="" x="66.82" y="70.675" rot="R270"/>
-<element name="JP12" library="pinhead" package="1X15" value="" x="64.25" y="70.675" rot="R270"/>
-<element name="JP14" library="pinhead" package="1X15" value="" x="89.95" y="70.675" rot="R270"/>
-<element name="JP15" library="pinhead" package="1X15" value="" x="87.38" y="70.675" rot="R270"/>
-<element name="JP16" library="pinhead" package="1X15" value="" x="84.81" y="70.675" rot="R270"/>
+<element name="D1" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="83.525" smashed="yes" rot="R180">
+<attribute name="NAME" x="73.88" y="82.89" size="1.27" layer="25" rot="R180"/>
+<attribute name="VALUE" x="73.88" y="85.43" size="1.27" layer="27" rot="R180"/>
+</element>
+<element name="D2" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="80.955" smashed="yes" rot="R180">
+<attribute name="NAME" x="73.88" y="80.32" size="1.27" layer="25" rot="R180"/>
+<attribute name="VALUE" x="73.88" y="82.86" size="1.27" layer="27" rot="R180"/>
+</element>
+<element name="D3" library="diode" library_urn="urn:adsk.eagle:library:210" package="SOD523" value="" x="73.245" y="78.385" smashed="yes" rot="R180">
+<attribute name="NAME" x="73.88" y="77.75" size="1.27" layer="25" rot="R180"/>
+<attribute name="VALUE" x="73.88" y="80.29" size="1.27" layer="27" rot="R180"/>
+</element>
+<element name="JP10" library="pinhead" package="1X15" value="" x="69.39" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="71.2188" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="66.215" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JP11" library="pinhead" package="1X15" value="" x="66.82" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="68.6488" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="63.645" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JP12" library="pinhead" package="1X15" value="" x="64.25" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="66.0788" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="61.075" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JP14" library="pinhead" package="1X15" value="" x="89.95" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="91.7788" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="86.775" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JP15" library="pinhead" package="1X15" value="" x="87.38" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="89.2088" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="84.205" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
+<element name="JP16" library="pinhead" package="1X15" value="" x="84.81" y="70.675" smashed="yes" rot="R270">
+<attribute name="NAME" x="86.6388" y="89.8012" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="81.635" y="89.725" size="1.27" layer="27" rot="R270"/>
+</element>
 <element name="JP4" library="pinhead" package="1X03" value="" x="15.42" y="79.67" smashed="yes">
 <attribute name="VALUE" x="11.61" y="76.495" size="1.27" layer="27"/>
 </element>
@@ -3144,7 +3215,10 @@ design rules under a new name.</description>
 <element name="JP60" library="pinhead" package="1X03" value="" x="46.26" y="56.54" smashed="yes">
 <attribute name="VALUE" x="42.45" y="53.365" size="1.27" layer="27"/>
 </element>
-<element name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" value="100" x="61" y="74" rot="R270"/>
+<element name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0603" value="100" x="61" y="74" smashed="yes" rot="R270">
+<attribute name="NAME" x="61.635" y="74.635" size="1.27" layer="25" rot="R270"/>
+<attribute name="VALUE" x="59.095" y="74.635" size="1.27" layer="27" rot="R270"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -3801,18 +3875,6 @@ design rules under a new name.</description>
 <wire x1="43.81" y1="11.685" x2="44.975" y2="12.85" width="0.1524" layer="16"/>
 <wire x1="44.975" y1="12.85" x2="44.975" y2="16.705" width="0.1524" layer="16"/>
 <wire x1="44.975" y1="16.705" x2="43.69" y2="17.99" width="0.1524" layer="16"/>
-</signal>
-<signal name="N$30">
-<contactref element="JP2" pad="18"/>
-<contactref element="2-18" pad="1"/>
-<contactref element="2-36" pad="1"/>
-<wire x1="43.64" y1="28.21" x2="43.64" y2="25.71" width="0.1524" layer="1"/>
-<wire x1="43.69" y1="25.7" x2="43.64" y2="25.71" width="0.1524" layer="1"/>
-<wire x1="43.64" y1="28.21" x2="43.69" y2="28.27" width="0.1524" layer="1"/>
-<wire x1="43.81" y1="14.12" x2="43.81" y2="14.255" width="0.1524" layer="1"/>
-<wire x1="43.81" y1="14.255" x2="44.975" y2="15.42" width="0.1524" layer="1"/>
-<wire x1="44.975" y1="15.42" x2="44.975" y2="24.415" width="0.1524" layer="1"/>
-<wire x1="44.975" y1="24.415" x2="43.69" y2="25.7" width="0.1524" layer="1"/>
 </signal>
 <signal name="INSIDE_THM">
 <contactref element="内温" pad="1"/>
@@ -5143,23 +5205,39 @@ design rules under a new name.</description>
 <wire x1="48.8" y1="56.54" x2="43.72" y2="56.54" width="0.1524" layer="1"/>
 <wire x1="46.26" y1="56.54" x2="48.8" y2="56.54" width="0.1524" layer="1"/>
 </signal>
-<signal name="N$69">
-<contactref element="U$1" pad="P$4"/>
+<signal name="LIN_TX">
 <contactref element="JP10" pad="7"/>
 <via x="79.0275" y="72.745" extent="1-16" drill="0.35"/>
-<wire x1="78.885" y1="62.695" x2="78.9064" y2="62.8164" width="0.1524" layer="16"/>
 <wire x1="78.9064" y1="62.8164" x2="78.9064" y2="63.3896875" width="0.1524" layer="16"/>
 <wire x1="78.9064" y1="63.3896875" x2="79.0275" y2="64.2107875" width="0.1524" layer="16"/>
 <wire x1="79.0275" y1="64.2107875" x2="79.0275" y2="72.745" width="0.1524" layer="16"/>
 <wire x1="79.0275" y1="72.745" x2="78.3975" y2="73.215" width="0.1524" layer="1"/>
 <wire x1="78.3975" y1="73.215" x2="69.39" y2="73.215" width="0.1524" layer="1"/>
+<contactref element="JP2" pad="18"/>
+<contactref element="2-18" pad="1"/>
+<contactref element="2-36" pad="1"/>
+<wire x1="43.64" y1="28.21" x2="43.64" y2="25.71" width="0.1524" layer="1"/>
+<wire x1="43.69" y1="25.7" x2="43.64" y2="25.71" width="0.1524" layer="1"/>
+<wire x1="43.64" y1="28.21" x2="43.69" y2="28.27" width="0.1524" layer="1"/>
+<wire x1="43.81" y1="14.12" x2="43.81" y2="14.255" width="0.1524" layer="1"/>
+<wire x1="43.81" y1="14.255" x2="44.975" y2="15.42" width="0.1524" layer="1"/>
+<wire x1="44.975" y1="15.42" x2="44.975" y2="24.415" width="0.1524" layer="1"/>
+<wire x1="44.975" y1="24.415" x2="43.69" y2="25.7" width="0.1524" layer="1"/>
+<wire x1="43.69" y1="28.27" x2="78.9064" y2="62.8164" width="0" layer="19" extent="16-16"/>
 </signal>
 </signals>
+<mfgpreviewcolors>
+<mfgpreviewcolor name="soldermaskcolor" color="0xC8008000"/>
+<mfgpreviewcolor name="silkscreencolor" color="0xFFFEFEFE"/>
+<mfgpreviewcolor name="backgroundcolor" color="0xFF282828"/>
+<mfgpreviewcolor name="coppercolor" color="0xFFFFBF00"/>
+<mfgpreviewcolor name="substratecolor" color="0xFF786E46"/>
+</mfgpreviewcolors>
 </board>
 </drawing>
 <compatibility>
 <note version="8.2" severity="warning">
-Since Version 8.2, Eagle supports online libraries. The ids
+Since Version 8.2, EAGLE supports online libraries. The ids
 of those online libraries will not be understood (or retained)
 with this version.
 </note>

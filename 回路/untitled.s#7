@@ -11638,6 +11638,15 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <junction x="30.48" y="-195.58"/>
 </segment>
 </net>
+<net name="N$69" class="0">
+<segment>
+<pinref part="U$1" gate="G$1" pin="LDAC"/>
+<wire x1="-167.64" y1="-119.38" x2="-175.26" y2="-119.38" width="0.1524" layer="91"/>
+<wire x1="-175.26" y1="-119.38" x2="-175.26" y2="-154.94" width="0.1524" layer="91"/>
+<pinref part="JP10" gate="A" pin="7"/>
+<wire x1="-175.26" y1="-154.94" x2="-160.02" y2="-154.94" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>

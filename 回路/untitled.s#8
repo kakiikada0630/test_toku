@@ -9525,8 +9525,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="JP57" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="JP58" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="JP60" library="pinhead" deviceset="PINHD-1X3" device=""/>
-<part name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="47k"/>
-<part name="R20" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="47k"/>
 </parts>
 <sheets>
 <sheet>
@@ -9801,8 +9799,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <instance part="JP57" gate="A" x="17.78" y="-195.58"/>
 <instance part="JP58" gate="A" x="25.4" y="-195.58"/>
 <instance part="JP60" gate="A" x="33.02" y="-195.58"/>
-<instance part="R11" gate="G$1" x="-172.72" y="-127" rot="R90"/>
-<instance part="R20" gate="G$1" x="-167.64" y="-132.08" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -10821,12 +10817,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="VDD"/>
-<wire x1="-167.64" y1="-111.76" x2="-172.72" y2="-111.76" width="0.1524" layer="91"/>
-<wire x1="-172.72" y1="-111.76" x2="-177.8" y2="-111.76" width="0.1524" layer="91"/>
+<wire x1="-167.64" y1="-111.76" x2="-177.8" y2="-111.76" width="0.1524" layer="91"/>
 <wire x1="-177.8" y1="-111.76" x2="-177.8" y2="-106.68" width="0.1524" layer="91"/>
-<pinref part="R11" gate="G$1" pin="2"/>
-<wire x1="-172.72" y1="-121.92" x2="-172.72" y2="-111.76" width="0.1524" layer="91"/>
-<junction x="-172.72" y="-111.76"/>
 </segment>
 </net>
 <net name="5VB" class="0">
@@ -11644,25 +11636,6 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pinref part="JP60" gate="A" pin="3"/>
 <wire x1="30.48" y1="-195.58" x2="30.48" y2="-198.12" width="0.1524" layer="91"/>
 <junction x="30.48" y="-195.58"/>
-</segment>
-</net>
-<net name="N$69" class="0">
-<segment>
-<pinref part="R20" gate="G$1" pin="2"/>
-<wire x1="-167.64" y1="-127" x2="-170.18" y2="-127" width="0.1524" layer="91"/>
-<wire x1="-170.18" y1="-127" x2="-170.18" y2="-132.08" width="0.1524" layer="91"/>
-<pinref part="R11" gate="G$1" pin="1"/>
-<wire x1="-170.18" y1="-132.08" x2="-172.72" y2="-132.08" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$113" class="0">
-<segment>
-<pinref part="R20" gate="G$1" pin="1"/>
-<wire x1="-167.64" y1="-137.16" x2="-165.1" y2="-137.16" width="0.1524" layer="91"/>
-<wire x1="-165.1" y1="-137.16" x2="-165.1" y2="-124.46" width="0.1524" layer="91"/>
-<wire x1="-165.1" y1="-124.46" x2="-167.64" y2="-124.46" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="RDY/BSY"/>
-<wire x1="-167.64" y1="-124.46" x2="-167.64" y2="-121.92" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

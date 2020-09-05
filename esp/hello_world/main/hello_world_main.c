@@ -25,13 +25,15 @@
 #include "spi_slave_peri.h"
 #include "spi_master.h"
 #include "uart_lmm.h"
+#include "uart_lin.h"
 #include "cmd_controller.h"
 #include "pin_assign.h"
 #include "system_param.h"
 
 
-#define SPI_DATA_SIZE 100  //uartデータサイズ
-#define URT_DATA_SIZE 500  //spiデータサイズ
+#define SPI_DATA_SIZE 100  //spiデータサイズ
+#define URT_DATA_SIZE 500  //uartデータサイズ
+#define LIN_DATA_SIZE  20  //spiデータサイズ
 
 void set_pwm()
 {
@@ -67,27 +69,33 @@ void SendData()
     int32_t         i              = 0;
     static int64_t  start_time     = 0;
     static int64_t  spi_latest_time= 0;
+    static int64_t  next_start_time= 0;
 	static uint8_t  urt_data[URT_DATA_SIZE] = {0};
+	static uint8_t  lin_data[LIN_DATA_SIZE] = {0};
 	static uint16_t spi_data[SPI_DATA_SIZE] = {0};
 	int32_t spi_size = 0;
 	int32_t urt_size = 0;
+	int32_t lin_size = 0;
 
 	while (1) {
 		memset( urt_data, 0, sizeof(uint8_t )*URT_DATA_SIZE );
+		memset( lin_data, 0, sizeof(uint8_t )*LIN_DATA_SIZE );
 		memset( spi_data, 0, sizeof(uint16_t)*SPI_DATA_SIZE );
 
 		spi_size        = get_spi_data( spi_data, SPI_DATA_SIZE );
 		urt_size        = recv_uart   ( urt_data, URT_DATA_SIZE );
-		spi_latest_time = get_spi_ratest_time();
+		lin_size        = recv_lin    ( lin_data, LIN_DATA_SIZE );
+		//spi_latest_time = get_spi_ratest_time();
 
 		int32_t  buf;
 		uint32_t pwm_log  = get_pwm_log_onoff();
 		uint32_t spi_log  = get_spi_log_onoff();
 		uint32_t uart_log = get_uart_log_onoff();
+		uint32_t lin_log = get_lin_log_onoff();
 		uint32_t bin_log  = get_bin_log_onoff();
 		start_time        = esp_timer_get_time();
 
-		if( pwm_log|spi_log|uart_log ) 
+		if( pwm_log|spi_log|uart_log|lin_log ) 
 		{
 			buf = (int32_t) (start_time/1000);
 			//ログ出力する設定なら、先頭にチックを出す
@@ -126,27 +134,37 @@ void SendData()
 			}
 		}
 
-		if( pwm_log|spi_log|uart_log ) 
+		if( lin_log )
+		{
+			for(uint32_t j=0 ; j<lin_size ; j++)
+			{
+				printf( "%02x", lin_data[j] );
+			}
+		}
+
+		if( pwm_log|spi_log|uart_log|lin_log ) 
 		{
 			printf("\n");
 		}
 
 		if( bin_log )
 		{
-			unsigned char bin_buf[250];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			unsigned char bin_buf[270];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
 			uint32_t *tick_pnt = 0;
 			uint16_t *buf_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
 			uint8_t  *urt_pnt  = 0;
+			uint8_t  *lin_pnt  = 0;
 			uint16_t *adc_pnt  = 0;
 			
 			tick_pnt = (uint32_t *)&bin_buf[  8];
 			buf_pnt  = (uint16_t *)&bin_buf[ 12];
 			spi_pnt  = (uint8_t  *)&bin_buf[ 40];
 			urt_pnt  = (uint8_t  *)&bin_buf[140];
-			adc_pnt  = (uint16_t *)&bin_buf[240];
+			lin_pnt  = (uint8_t  *)&bin_buf[240];
+			adc_pnt  = (uint16_t *)&bin_buf[260];
 			
-			memset(bin_buf, 0, 250 );
+			memset(bin_buf, 0, 270 );
 			
 			//スタート符号
 			for(uint32_t j=0 ; j < 8 ; j++ )
@@ -180,33 +198,42 @@ void SendData()
 				*(urt_pnt+j) = *(urt_data+j);
 			}
 			
+			//LIN
+			for(uint32_t j=0 ; j<lin_size ; j++)
+			{
+				*(lin_pnt+j) = *(lin_data+j);
+			}
+			
 			*(adc_pnt  ) = get_lcm_dec();
 			*(adc_pnt+1) = get_led1_dec();
 			*(adc_pnt+2) = get_led2_dec();
 			*(adc_pnt+3) = get_led3_dec();
 			
-			fwrite(bin_buf, 250, 1, stdout);
+			fwrite(bin_buf, 270, 1, stdout);
 		}
 
 		exec_cmd();
 		i++;
 
+		//int64_t base_time;
+		//int64_t check_time = esp_timer_get_time();
+		//base_time = ( check_time - spi_latest_time < (int64_t)5000 )? spi_latest_time : start_time;
+
 		while(1)
 		{
-			int64_t base_time;
 			int64_t check_time = esp_timer_get_time();
 
 			// spiを受信している場合、最後にspiを受信した時間をベースに
 			// 次のループまでのwait時間を調整する。spiが5ms以上受信していない
-			// ない場合、ループの開始時間をベースに、次のループまでのwait時間を調整する。
-			base_time = ( check_time - spi_latest_time < (int64_t)5000 )? spi_latest_time : start_time;
+			// 場合、ループの開始時間をベースに、次のループまでのwait時間を調整する。
 
-			if( base_time+(int64_t)4600 < check_time )
+			if( next_start_time+(int64_t)4995 < check_time )
 			{
+				next_start_time = check_time;
 				break;
 			}
-            //ets_delay_us(50);
-			vTaskDelay(1);
+            ets_delay_us(5);
+			//vTaskDelay(1);
 		}
 
     }
@@ -215,6 +242,7 @@ void SendData()
 void app_main()
 {
 	init_uart();
+	init_lin ();
 
 	//------------------------
 	// デバッグ用初期化処理

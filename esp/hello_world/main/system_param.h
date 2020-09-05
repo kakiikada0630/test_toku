@@ -15,6 +15,11 @@ uint32_t get_uart_log_onoff();
 void     set_uart_log_onoff( uint32_t val );
 
 //--------------------------
+// LINƒƒO‚Ìİ’è
+uint32_t get_lin_log_onoff();
+void     set_lin_log_onoff( uint32_t val );
+
+//--------------------------
 // SPIƒƒO‚Ìİ’è
 uint32_t get_spi_log_onoff();
 void     set_spi_log_onoff( uint32_t val );
