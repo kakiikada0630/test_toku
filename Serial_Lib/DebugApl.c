@@ -29,6 +29,9 @@ typedef struct _TAG_SYSCTRL
 
 	HANDLE thread_handle;
 	DWORD thread_id;
+
+	HANDLE thread_server_handle;
+	DWORD  thread_server_id;
 } sysctrl_t;
 
 static sysctrl_t sys_t={0};
@@ -468,7 +471,9 @@ void FileCloseInt()
 	sys_t.output_analized = NULL;
 }
 
-
+//---------------------------------------------------
+// COMポートからのデータ受信監視スレッド
+//---------------------------------------------------
 DWORD WINAPI execute_thread(LPVOID param)
 {
 	unsigned char buf[1024]; 
@@ -513,7 +518,65 @@ DWORD WINAPI execute_thread(LPVOID param)
 	return 0;
 }
 
+//---------------------------------------------------
+// 外部公開用の名前付きパイプ作成及び監視スレッド
+//---------------------------------------------------
+DWORD WINAPI execute_serverthread(LPVOID param)
+{
+	unsigned char buf[1024]; 
+	int len;
 
+    HANDLE hPipe = INVALID_HANDLE_VALUE;
+    hPipe = CreateNamedPipe("\\\\.\\pipe\\DebugApl", //lpName
+                           PIPE_ACCESS_INBOUND,            // dwOpenMode
+                           PIPE_TYPE_BYTE | PIPE_WAIT,     // dwPipeMode
+                           1,                              // nMaxInstances
+                           0,                              // nOutBufferSize
+                           0,                              // nInBufferSize
+                           100,                            // nDefaultTimeOut
+                           NULL);                          // lpSecurityAttributes
+
+    if (hPipe == INVALID_HANDLE_VALUE) {
+        fprintf(log_file, "Couldn't create NamedPipe.");
+        return 1;
+    }
+
+    //fprintf(log_file, "名前付きパイプ作成.\n");
+
+
+	while(1)
+	{
+	    if (!ConnectNamedPipe(hPipe, NULL)) {
+	        fprintf(log_file, "Couldn't connect to NamedPipe.");
+	        CloseHandle(hPipe);
+	        return 1;
+	    }
+
+	    //fprintf(log_file, "クライアント接続.\n");
+
+		while( 1 )
+		{
+	        char szBuff[256];
+	        DWORD dwBytesRead;
+	        if (!ReadFile(hPipe, szBuff, sizeof(szBuff), &dwBytesRead, NULL)) {
+	                fprintf(log_file, "Couldn't read NamedPipe.");
+	                break;
+	        }
+	        szBuff[dwBytesRead] = '\0';
+			serial_send(sys_t.obj,szBuff,sizeof(szBuff));
+	        fprintf(log_file, "[%s]cmd=%s  from_pipe\n", __func__, szBuff);
+	        //Sleep(1);
+		}
+		FlushFileBuffers(hPipe);
+		DisconnectNamedPipe(hPipe);
+	}
+
+    fprintf(log_file, "終了.\n");
+    CloseHandle(hPipe);
+
+	ExitThread(TRUE);
+	return 0;
+}
 
 //---------------------------------------------------
 // 外部公開関数
@@ -526,6 +589,9 @@ DLLAPI void OpenSerial(char* com_name)
 	if( log_file == NULL ) { log_file = fopen(log_fname, "w"); }
 	if( log_file != NULL ) { fprintf( log_file, "[%s] COM=%s\n", __func__, com_name ); }
 	//------- 動作ログ用 -------
+
+	// スレッド処理実行開始
+	sys_t.thread_server_handle = CreateThread(NULL,0,execute_serverthread,NULL,0,&sys_t.thread_server_id);
 
 	sys_t.obj = serial_create(com_name,921600);
 	if ( sys_t.obj == NULL ) {

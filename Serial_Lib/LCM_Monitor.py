@@ -45,7 +45,7 @@ class PARAM(ctypes.Structure):
 		("DAC_LED2"     , ctypes.c_int32),
 		("DAC_LED3"     , ctypes.c_int32)]
 
-DebufApl = ctypes.WinDLL("./DebgApl.dll")
+DebufApl = ctypes.WinDLL("./DebgApl_server.dll")
 
 DebufApl.FileOpen.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 
@@ -59,7 +59,7 @@ DebufApl.GetParam.argtypes   = (ctypes.POINTER(PARAM),)
 #-----------------------------------
 # 環境に合わせて変える!!!
 #-----------------------------------
-COM_NAME = b"\\\.\COM3"
+COM_NAME = b"\\\.\COM5"
 
 #-----------------------------------
 
