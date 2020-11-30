@@ -66,7 +66,7 @@ int32_t get_percent_A2()
 	//0%‚©100.00%‚É’£‚è•t‚¢‚Ä‚¢‚é‚Æ”»’f‚·‚éB
 	if( buf > 7000 )
 	{
-		per = ( gpio_get_level(GPIO_A2)==1 )? 0 : 10000;
+		per = ( gpio_get_level(GPIO_A2)==0 )? 0 : 10000;
 	}
 
 	return per;

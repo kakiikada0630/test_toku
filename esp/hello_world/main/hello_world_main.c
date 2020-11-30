@@ -149,7 +149,7 @@ void SendData()
 
 		if( bin_log )
 		{
-			unsigned char bin_buf[270];  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			unsigned char bin_buf[270]={0};  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
 			uint32_t *tick_pnt = 0;
 			uint16_t *buf_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
@@ -164,7 +164,7 @@ void SendData()
 			lin_pnt  = (uint8_t  *)&bin_buf[240];
 			adc_pnt  = (uint16_t *)&bin_buf[260];
 			
-			memset(bin_buf, 0, 270 );
+			memset(bin_buf, 0, 250 );
 			
 			//スタート符号
 			for(uint32_t j=0 ; j < 8 ; j++ )

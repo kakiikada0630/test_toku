@@ -537,34 +537,34 @@ DWORD WINAPI execute_serverthread(LPVOID param)
                            NULL);                          // lpSecurityAttributes
 
     if (hPipe == INVALID_HANDLE_VALUE) {
-        fprintf(log_file, "Couldn't create NamedPipe.");
+        fprintf(log_file, "Couldn't create NamedPipe.\n");
         return 1;
     }
 
-    //fprintf(log_file, "名前付きパイプ作成.\n");
+    fprintf(log_file, "名前付きパイプ作成.\n");
 
 
 	while(1)
 	{
 	    if (!ConnectNamedPipe(hPipe, NULL)) {
-	        fprintf(log_file, "Couldn't connect to NamedPipe.");
+	        fprintf(log_file, "Couldn't connect to NamedPipe.\n");
 	        CloseHandle(hPipe);
 	        return 1;
 	    }
 
-	    //fprintf(log_file, "クライアント接続.\n");
+	    fprintf(log_file, "クライアント接続.\n");
 
 		while( 1 )
 		{
 	        char szBuff[256];
 	        DWORD dwBytesRead;
 	        if (!ReadFile(hPipe, szBuff, sizeof(szBuff), &dwBytesRead, NULL)) {
-	                fprintf(log_file, "Couldn't read NamedPipe.");
+	                //fprintf(log_file, "Couldn't read NamedPipe.\n");
 	                break;
 	        }
 	        szBuff[dwBytesRead] = '\0';
-			serial_send(sys_t.obj,szBuff,sizeof(szBuff));
-	        fprintf(log_file, "[%s]cmd=%s  from_pipe\n", __func__, szBuff);
+			serial_send(sys_t.obj,szBuff,dwBytesRead);
+	        fprintf(log_file, "[%s]cmd=%s %d from_pipe\n", __func__, szBuff, dwBytesRead);
 	        //Sleep(1);
 		}
 		FlushFileBuffers(hPipe);

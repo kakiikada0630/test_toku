@@ -84,11 +84,11 @@ uint32_t recv_uart(uint8_t* p_rec, uint32_t size)
 	int length  = 0;
 	int length2 = 0;
 
-	// 200us待ってもサイズが変化しなかった場合、一連の
+	// 150us待ってもサイズが変化しなかった場合、一連の
 	// 命令列を受信完了と判断する。
 	do{
 		ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_2	, (size_t*)&length));
-		ets_delay_us(200);
+		ets_delay_us(150);
 		//vTaskDelay(1);
 		ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_2	, (size_t*)&length2));
 	}while( length != length2 );

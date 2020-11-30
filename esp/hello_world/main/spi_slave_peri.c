@@ -127,8 +127,8 @@ uint32_t get_spi_data(uint16_t* p_data, uint32_t buf_size)
 
 			break;
 		}
-		//ets_delay_us(200);
-		vTaskDelay(1);
+		ets_delay_us(200);
+		//vTaskDelay(1);
 
 	}
 
