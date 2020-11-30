@@ -541,7 +541,7 @@ DWORD WINAPI execute_serverthread(LPVOID param)
         return 1;
     }
 
-    fprintf(log_file, "名前付きパイプ作成.\n");
+    //fprintf(log_file, "名前付きパイプ作成.\n");
 
 
 	while(1)
@@ -552,7 +552,7 @@ DWORD WINAPI execute_serverthread(LPVOID param)
 	        return 1;
 	    }
 
-	    fprintf(log_file, "クライアント接続.\n");
+	    //fprintf(log_file, "クライアント接続.\n");
 
 		while( 1 )
 		{
@@ -564,7 +564,7 @@ DWORD WINAPI execute_serverthread(LPVOID param)
 	        }
 	        szBuff[dwBytesRead] = '\0';
 			serial_send(sys_t.obj,szBuff,dwBytesRead);
-	        fprintf(log_file, "[%s]cmd=%s %d from_pipe\n", __func__, szBuff, dwBytesRead);
+	        fprintf(log_file, "[%s]cmd=%s", __func__, szBuff);
 	        //Sleep(1);
 		}
 		FlushFileBuffers(hPipe);
