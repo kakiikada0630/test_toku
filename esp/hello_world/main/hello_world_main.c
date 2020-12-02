@@ -149,7 +149,7 @@ void SendData()
 
 		if( bin_log )
 		{
-			unsigned char bin_buf[270]={0};  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			unsigned char bin_buf[300]={0};  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
 			uint32_t *tick_pnt = 0;
 			uint16_t *buf_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
@@ -161,10 +161,10 @@ void SendData()
 			buf_pnt  = (uint16_t *)&bin_buf[ 12];
 			spi_pnt  = (uint8_t  *)&bin_buf[ 40];
 			urt_pnt  = (uint8_t  *)&bin_buf[140];
-			lin_pnt  = (uint8_t  *)&bin_buf[240];
-			adc_pnt  = (uint16_t *)&bin_buf[260];
+			lin_pnt  = (uint8_t  *)&bin_buf[270];
+			adc_pnt  = (uint16_t *)&bin_buf[290];
 			
-			memset(bin_buf, 0, 250 );
+			memset(bin_buf, 0, 300 );
 			
 			//スタート符号
 			for(uint32_t j=0 ; j < 8 ; j++ )
@@ -209,7 +209,7 @@ void SendData()
 			*(adc_pnt+2) = get_led2_dec();
 			*(adc_pnt+3) = get_led3_dec();
 			
-			fwrite(bin_buf, 270, 1, stdout);
+			fwrite(bin_buf, 300, 1, stdout);
 		}
 
 		exec_cmd();
