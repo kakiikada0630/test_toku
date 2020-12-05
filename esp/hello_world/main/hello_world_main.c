@@ -29,6 +29,7 @@
 #include "cmd_controller.h"
 #include "pin_assign.h"
 #include "system_param.h"
+#include "bin_format.h"
 
 
 #define SPI_DATA_SIZE 100  //spiデータサイズ
@@ -68,7 +69,6 @@ void SendData()
 {
     int32_t         i              = 0;
     static int64_t  start_time     = 0;
-    static int64_t  spi_latest_time= 0;
     static int64_t  next_start_time= 0;
 	static uint8_t  urt_data[URT_DATA_SIZE] = {0};
 	static uint8_t  lin_data[LIN_DATA_SIZE] = {0};
@@ -77,6 +77,8 @@ void SendData()
 	int32_t urt_size = 0;
 	int32_t lin_size = 0;
 
+
+	next_start_time = esp_timer_get_time();
 	while (1) {
 		memset( urt_data, 0, sizeof(uint8_t )*URT_DATA_SIZE );
 		memset( lin_data, 0, sizeof(uint8_t )*LIN_DATA_SIZE );
@@ -85,7 +87,6 @@ void SendData()
 		spi_size        = get_spi_data( spi_data, SPI_DATA_SIZE );
 		urt_size        = recv_uart   ( urt_data, URT_DATA_SIZE );
 		lin_size        = recv_lin    ( lin_data, LIN_DATA_SIZE );
-		//spi_latest_time = get_spi_ratest_time();
 
 		int32_t  buf;
 		uint32_t pwm_log  = get_pwm_log_onoff();
@@ -149,22 +150,24 @@ void SendData()
 
 		if( bin_log )
 		{
-			unsigned char bin_buf[300]={0};  //0～7:スタート符号 8～11:チック  12～39:PWM  40～139:SPI  140～239:UART
+			unsigned char bin_buf[BLOCK_SIZE]={0};
 			uint32_t *tick_pnt = 0;
-			uint16_t *buf_pnt  = 0;
+			uint16_t *pwm_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
 			uint8_t  *urt_pnt  = 0;
 			uint8_t  *lin_pnt  = 0;
 			uint16_t *adc_pnt  = 0;
+			uint32_t *sw_pnt  = 0;
 			
-			tick_pnt = (uint32_t *)&bin_buf[  8];
-			buf_pnt  = (uint16_t *)&bin_buf[ 12];
-			spi_pnt  = (uint8_t  *)&bin_buf[ 40];
-			urt_pnt  = (uint8_t  *)&bin_buf[140];
-			lin_pnt  = (uint8_t  *)&bin_buf[270];
-			adc_pnt  = (uint16_t *)&bin_buf[290];
+			tick_pnt = (uint32_t *)&bin_buf[BLOCK_TICK];
+			pwm_pnt  = (uint16_t *)&bin_buf[BLOCK_PWM ];
+			spi_pnt  = (uint8_t  *)&bin_buf[BLOCK_SPI ];
+			urt_pnt  = (uint8_t  *)&bin_buf[BLOCK_UART];
+			lin_pnt  = (uint8_t  *)&bin_buf[BLOCK_LIN ];
+			adc_pnt  = (uint16_t *)&bin_buf[BLOCK_DAC ];
+			sw_pnt   = (uint32_t *)&bin_buf[BLOCK_SW  ];
 			
-			memset(bin_buf, 0, 300 );
+			memset(bin_buf, 0, BLOCK_SIZE );
 			
 			//スタート符号
 			for(uint32_t j=0 ; j < 8 ; j++ )
@@ -176,14 +179,14 @@ void SendData()
 			*tick_pnt = (int32_t) (start_time/1000);
 
 			//PWM
-			*(buf_pnt+0)=(uint16_t)get_percent_discharge();
-			*(buf_pnt+1)=(uint16_t)get_percent_A1();
-			*(buf_pnt+2)=(uint16_t)get_percent_A2();
-			*(buf_pnt+3)=(uint16_t)get_percent_B1();
-			*(buf_pnt+4)=(uint16_t)get_percent_B2();
-			*(buf_pnt+5)=(uint16_t)get_percent_B3();
-			*(buf_pnt+6)=(uint16_t)get_percent_UDIM21();
-			*(buf_pnt+7)=(uint16_t)get_percent_UDIM22();
+			*(pwm_pnt+0)=(uint16_t)get_percent_discharge();
+			*(pwm_pnt+1)=(uint16_t)get_percent_A1();
+			*(pwm_pnt+2)=(uint16_t)get_percent_A2();
+			*(pwm_pnt+3)=(uint16_t)get_percent_B1();
+			*(pwm_pnt+4)=(uint16_t)get_percent_B2();
+			*(pwm_pnt+5)=(uint16_t)get_percent_B3();
+			*(pwm_pnt+6)=(uint16_t)get_percent_UDIM21();
+			*(pwm_pnt+7)=(uint16_t)get_percent_UDIM22();
 
 			//SPI
 			uint8_t *spi_data_buf = (uint8_t *)spi_data;
@@ -209,15 +212,13 @@ void SendData()
 			*(adc_pnt+2) = get_led2_dec();
 			*(adc_pnt+3) = get_led3_dec();
 			
-			fwrite(bin_buf, 300, 1, stdout);
+			*(sw_pnt)    = sw_status();
+			
+			fwrite(bin_buf, BLOCK_SIZE, 1, stdout);
 		}
 
 		exec_cmd();
 		i++;
-
-		//int64_t base_time;
-		//int64_t check_time = esp_timer_get_time();
-		//base_time = ( check_time - spi_latest_time < (int64_t)5000 )? spi_latest_time : start_time;
 
 		while(1)
 		{
@@ -229,7 +230,7 @@ void SendData()
 
 			if( next_start_time+(int64_t)4995 < check_time )
 			{
-				next_start_time = check_time;
+				next_start_time = next_start_time+5000;
 				break;
 			}
             ets_delay_us(5);

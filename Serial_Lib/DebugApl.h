@@ -53,6 +53,10 @@ struct Parameter
 	int DAC_LED1      ;  // Åé * 100
 	int DAC_LED2      ;  // Åé * 100
 	int DAC_LED3      ;  // Åé * 100
+	int VBU           ;  // 1:ON, 0:OFF
+	int IG1           ;  // 1:ON, 0:OFF
+	int TURNS         ;  // 1:ON, 0:OFF
+	int HLBKUP        ;  // 1:ON, 0:OFF
 };
 
 

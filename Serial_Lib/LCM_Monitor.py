@@ -3,6 +3,12 @@ import threading
 import time
 import ctypes
 
+#-----------------------------------
+# 環境に合わせて変える!!!
+#-----------------------------------
+COM_NAME = b"\\\.\COM7"
+
+#-----------------------------------
 
 class PARAM(ctypes.Structure):
 	_fields_ = [ 
@@ -43,7 +49,11 @@ class PARAM(ctypes.Structure):
 		("DAC_LCM"      , ctypes.c_int32),
 		("DAC_LED1"     , ctypes.c_int32),
 		("DAC_LED2"     , ctypes.c_int32),
-		("DAC_LED3"     , ctypes.c_int32)]
+		("DAC_LED3"     , ctypes.c_int32),
+		("VBU"          , ctypes.c_int32),
+		("IG1"          , ctypes.c_int32),
+		("TURNS"        , ctypes.c_int32),
+		("HLBKUP"       , ctypes.c_int32)]
 
 DebufApl = ctypes.WinDLL("./DebgApl_server.dll")
 
@@ -56,12 +66,6 @@ DebufApl.WriteCmd.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 DebufApl.GetParam.argtypes   = (ctypes.POINTER(PARAM),)
 
 
-#-----------------------------------
-# 環境に合わせて変える!!!
-#-----------------------------------
-COM_NAME = b"\\\.\COM7"
-
-#-----------------------------------
 
 
 vbu_state = 0
@@ -70,6 +74,10 @@ turn_state = 0
 hlbkup_state = 0
 
 def time_count():
+    global vbu_state
+    global ig1_state
+    global turn_state
+    global hlbkup_state
     param = PARAM()
 
     while True:
@@ -115,6 +123,35 @@ def time_count():
         lbl_CurD_val.config(text=param.D_CUR)
         lbl_Boost_val.config(text=param.BOOST_VOL)
 
+        if 0 != param.VBU:
+            Btn_Vbu.config( text="VBU on",bg="skyblue")
+            vbu_state = 1
+        else:
+            Btn_Vbu.config( text="VBU off",bg="SystemButtonFace")
+            vbu_state = 0
+
+        if 0 != param.IG1:
+            Btn_Ig1.config( text="IG1 on",bg="skyblue")
+            ig1_state = 1
+        else:
+            Btn_Ig1.config( text="IG1 off",bg="SystemButtonFace")
+            ig1_state = 0
+
+        if 0 != param.TURNS:
+            Btn_Turn.config( text="Turn on",bg="skyblue")
+            turn_state = 1
+        else:
+            Btn_Turn.config( text="Turn off",bg="SystemButtonFace")
+            turn_state = 0
+
+        if 0 != param.HLBKUP:
+            Btn_Hlbkup.config( text="HL on",bg="skyblue")
+            hlbkup_state = 1
+        else:
+            Btn_Hlbkup.config( text="HL off",bg="SystemButtonFace")
+            hlbkup_state = 0
+
+
 def lcm_dec():
     moji = b"dac 0 " + (txt_LCMDec.get()).encode('utf-8') + b'\n'
     #print( moji )
@@ -150,52 +187,36 @@ def cmd_vbu():
     if 0 == vbu_state:
         moji = b"vbu on " + b'\n'
         DebufApl.WriteCmd(moji)
-        vbu_state = 1
-        Btn_Vbu.config( text="VBU on",bg="skyblue")
     else:
         moji = b"vbu off " + b'\n'
         DebufApl.WriteCmd(moji)
-        vbu_state = 0
-        Btn_Vbu.config( text="VBU off",bg="SystemButtonFace")
 
 def cmd_ig1():
     global ig1_state
     if 0 == ig1_state:
         moji = b"ig1 on " + b'\n'
         DebufApl.WriteCmd(moji)
-        ig1_state = 1
-        Btn_Ig1.config( text="IG1 on",bg="skyblue")
     else:
         moji = b"ig1 off " + b'\n'
         DebufApl.WriteCmd(moji)
-        ig1_state = 0
-        Btn_Ig1.config( text="IG1 off",bg="SystemButtonFace")
 
 def cmd_turn():
     global turn_state
     if 0 == turn_state:
         moji = b"turn on " + b'\n'
         DebufApl.WriteCmd(moji)
-        turn_state = 1
-        Btn_Turn.config( text="Turn on",bg="skyblue")
     else:
         moji = b"turn off " + b'\n'
         DebufApl.WriteCmd(moji)
-        turn_state = 0
-        Btn_Turn.config( text="Turn off",bg="SystemButtonFace")
 
 def cmd_hlbkup():
     global hlbkup_state
     if 0 == hlbkup_state:
         moji = b"hlbkup on " + b'\n'
         DebufApl.WriteCmd(moji)
-        hlbkup_state = 1
-        Btn_Hlbkup.config( text="H/L Bkup on",bg="skyblue")
     else:
         moji = b"hlbkup off " + b'\n'
         DebufApl.WriteCmd(moji)
-        hlbkup_state = 0
-        Btn_Hlbkup.config( text="H/L Bkup off",bg="SystemButtonFace")
 
 
 frame=1

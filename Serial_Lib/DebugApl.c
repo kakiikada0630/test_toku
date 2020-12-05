@@ -297,6 +297,16 @@ void Analize_DAC( unsigned char* buf, int size, struct Parameter *param )
 	param->DAC_LED3 = *(dac_pnt+3);
 }
 
+void Analize_SW( unsigned char* buf, int size, struct Parameter *param )
+{
+	unsigned int sw_status = *((unsigned int *)(buf+BLOCK_SW));
+
+	param->VBU    = ( 0 == (sw_status & SW_VBU_STATUS    ))? 0 : 1;
+	param->IG1    = ( 0 == (sw_status & SW_IG1_STATUS    ))? 0 : 1;
+	param->TURNS  = ( 0 == (sw_status & SW_TURNS_STATUS  ))? 0 : 1;
+	param->HLBKUP = ( 0 == (sw_status & SW_HLBKUP_STATUS ))? 0 : 1;
+}
+
 void Analize( unsigned char* buf, int size, struct Parameter *param )
 {
 	unsigned int* tick_pnt = (unsigned int*)(buf+BLOCK_TICK);
@@ -306,6 +316,7 @@ void Analize( unsigned char* buf, int size, struct Parameter *param )
 	Analize_SPI (buf, size, param);
 	Analize_UART(buf, size, param);
 	Analize_DAC (buf, size, param);
+	Analize_SW  (buf, size, param);
 }
 
 void WriteLog( unsigned char* buf, int size, struct Parameter *param )
@@ -317,6 +328,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	unsigned char  *out= data;
 	unsigned char  *buf8  = 0;
 	unsigned short *buf16 = (unsigned short*)(buf+BLOCK_PWM);
+	unsigned int   *buf32;
 	unsigned int   loop   = 0;
 
 	if( (sys_t.output_org == NULL) || (sys_t.output_analized == NULL) )
@@ -369,11 +381,20 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	out+=2;
 
 	// DAC
-	loop = ( BLOCK_SIZE - BLOCK_DAC )/2;
+	loop = ( BLOCK_SW - BLOCK_DAC )/2;
 	buf16 = (unsigned short*)(buf + BLOCK_DAC);
 	for( int i=0 ; i<loop  ; i++ )
 	{
 		sprintf( out+i*6, "%04x, ", *(buf16+i) );
+	}
+	out+=6*loop;
+
+	// SW
+	loop = ( BLOCK_SIZE - BLOCK_SW )/4;
+	buf32 = (unsigned int*)(buf + BLOCK_SW);
+	for( int i=0 ; i<loop  ; i++ )
+	{
+		sprintf( out+i*10, "%08x, ", *(buf32+i) );
 	}
 
 	fprintf(sys_t.output_org,"%s\n",data );
@@ -383,7 +404,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	//-----------------------------------------
 	out= data;
 	fprintf(sys_t.output_analized,"[%7d],",param->TICK );
-	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 					param->PWM_A1       ,
 					param->PWM_A2       ,
 					param->PWM_B1       ,
@@ -420,7 +441,11 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 					param->DAC_LCD      ,
 					param->DAC_LED1     ,
 					param->DAC_LED2     ,
-					param->DAC_LED3     );
+					param->DAC_LED3     ,
+					param->VBU          ,
+					param->IG1          ,
+					param->TURNS        ,
+					param->HLBKUP       );
 		fprintf(sys_t.output_analized,"%s",data);
 
 	//-----------------------------------------
@@ -450,7 +475,7 @@ void FileOpenInt()
 		sys_t.output_org = NULL;
 		return;                            // àŸèÌèIóπ
 	}
-	sprintf( out, "[Tick(ms)],Discharge,A1,A2,B1,B2,B3,UDIM21,UDIM22,-,-,-,-,-,-,SPI,UART,LIN,lcm_Dec,led_Dec1,led_Dec2,led_Dec3,led_Dec4,-\n");
+	sprintf( out, "[Tick(ms)],Discharge,A1,A2,B1,B2,B3,UDIM21,UDIM22,-,-,-,-,-,-,SPI,UART,LIN,lcm_Dec,led_Dec1,led_Dec2,led_Dec3,-,SW_Status\n");
 	fprintf(sys_t.output_org,"%s",out);
 	
 
@@ -458,7 +483,7 @@ void FileOpenInt()
 	fprintf(sys_t.output_analized,"x_CUR=(mA)\n",out);
 	fprintf(sys_t.output_analized,"xx_PWM=(0.01%/LSB)\n",out);
 	fprintf(sys_t.output_analized,"DAC_xxx=(Åé)\n",out);
-	sprintf( out, "[Tick(ms)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3\n");
+	sprintf( out, "[Tick(ms)],A1_PWM,A2_PWM,B1_PWM,B2_PWM,B3_PWM,DISCHARGE_PWM,UDIM21_PWM,UDIM22_PWM,C1_PWM,C2_PWM,C3_PWM,C4_PWM,C5_PWM,C6_PWM,C7_PWM,C8_PWM,C9_PWM,C10_PWM,C11_PWM,C12_PWM,D1_PWM,D2_PWM,D3_PWM,D4_PWM,D5_PWM,D6_PWM,D7_PWM,D8_PWM,BoostVol,A_CUR,B_CUR,C_CUR,D_CUR,DAC_LCD,DAC_LED1,DAC_LED2,DAC_LED3,VBU,IG1,TURN_Sync,HLBkup\n");
 	fprintf(sys_t.output_analized,"%s",out);
 }
 

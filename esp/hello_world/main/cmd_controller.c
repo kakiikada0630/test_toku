@@ -16,6 +16,7 @@
 #include "i2c_server.h"
 #include "uart_lmm.h"
 #include "uart_lin.h"
+#include "bin_format.h"
 
 
 #define DEC2DAC_TABLE_SIZE  195
@@ -227,17 +228,19 @@ struct DEC2DAC
 #define CMD_BUF_SIZE 256
 
 static char  cmd[CMD_BUF_SIZE];
-
+static uint32_t SwStatus =0;
 
 static inline void CMD_HLBackUp( const char* op1 )
 {
 	if( 0 == memcmp(op1, "on", 2 ) )
 	{
 		gpio_set_level(GPIO_HLBKUP_PIN, 1);
+		SwStatus = SwStatus | SW_HLBKUP_STATUS;
 	}
 	else if( 0 == memcmp(op1, "off", 3 ) )
 	{
 		gpio_set_level(GPIO_HLBKUP_PIN, 0);
+		SwStatus = SwStatus & ~SW_HLBKUP_STATUS;
 	}
 	else{}
 }
@@ -247,10 +250,12 @@ static inline void CMD_TurnSync( const char* op1 )
 	if( 0 == memcmp(op1, "on", 2 ) )
 	{
 		gpio_set_level(GPIO_TURNSYNC_PIN, 1);
+		SwStatus = SwStatus | SW_TURNS_STATUS;
 	}
 	else if( 0 == memcmp(op1, "off", 3 ) )
 	{
 		gpio_set_level(GPIO_TURNSYNC_PIN, 0);
+		SwStatus = SwStatus & ~SW_TURNS_STATUS;
 	}
 	else{}
 }
@@ -261,10 +266,12 @@ static inline void CMD_IG1( const char* op1 )
 	if( 0 == memcmp(op1, "on", 2 ) )
 	{
 		gpio_set_level(GPIO_IG1_PIN, 1);
+		SwStatus = SwStatus | SW_IG1_STATUS;
 	}
 	else if( 0 == memcmp(op1, "off", 3 ) )
 	{
 		gpio_set_level(GPIO_IG1_PIN, 0);
+		SwStatus = SwStatus & ~SW_IG1_STATUS;
 	}
 	else{}
 }
@@ -274,10 +281,12 @@ static inline void CMD_VBU( const char* op1 )
 	if( 0 == memcmp(op1, "on", 2 ) )
 	{
 		gpio_set_level(GPIO_VBU_PIN, 1);
+		SwStatus = SwStatus | SW_VBU_STATUS;
 	}
 	else if( 0 == memcmp(op1, "off", 3 ) )
 	{
 		gpio_set_level(GPIO_VBU_PIN, 0);
+		SwStatus = SwStatus & ~SW_VBU_STATUS;
 	}
 	else{}
 }
@@ -410,6 +419,11 @@ static inline void CMD_BINARY_LOG( const char* op1 )
 		set_bin_log_onoff( 0 );
 	}
 	else{}
+}
+
+uint32_t sw_status()
+{
+	return SwStatus;
 }
 
 void exec_cmd()
