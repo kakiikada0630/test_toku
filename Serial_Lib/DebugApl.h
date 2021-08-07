@@ -72,6 +72,11 @@ DLLAPI void WriteCmd( char* cmd );
 
 DLLAPI void GetParam( struct Parameter *param );
 
+DLLAPI void GetMiconVer( char* ver );
+
+DLLAPI void GetVer( char* ver );
+
+
 #ifdef __cplusplus
 }
 #endif

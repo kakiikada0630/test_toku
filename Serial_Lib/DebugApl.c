@@ -38,6 +38,8 @@ static sysctrl_t sys_t={0};
 FILE *log_file;
 
 
+static unsigned char MICON_VERSION[VER_SIZE] = {0};
+
 void Analize_PWM( unsigned char* buf, int size, struct Parameter *param )
 {
 	unsigned short* buf16 = (unsigned short *)(buf+BLOCK_PWM);
@@ -188,6 +190,7 @@ void Analize_UART( unsigned char* buf, int size, struct Parameter *param )
 	
 	unsigned int StringC[12] = {0};
 	unsigned int StringD[ 8] = {0};
+	unsigned int count=0;
 	
 
 	while(1)
@@ -198,6 +201,11 @@ void Analize_UART( unsigned char* buf, int size, struct Parameter *param )
 		unsigned int reg_add;
 		unsigned int data;
 
+		if( count > size )
+		{
+			break;
+		}
+		
 		cmd = *buf8;
  		
 		// Write命令
@@ -219,18 +227,23 @@ void Analize_UART( unsigned char* buf, int size, struct Parameter *param )
 		else if( cmd == 0x78 ){ buf8+= 5; continue; }   // REG_ADD= 1Byte, INIT=1Byte, DevID=1Byte, CRC=2Byte
 		else
 		{
-			break;
+			count++;
+			buf8++;
+			continue;
 		}
 		
 		// デバイスIDの取得
 		buf8 = buf8+1;
 		dev_add = *buf8;
+		count++;
 
 		// レジスタアドレス取得
 		buf8 = buf8+1;
 		reg_add = *buf8;
 		buf8 = buf8+1;
 
+		count+=2;
+		
 		for(int i=0 ; i<data_size ; i++)
 		{
 			data = *buf8;
@@ -259,10 +272,12 @@ void Analize_UART( unsigned char* buf, int size, struct Parameter *param )
 
 			reg_add = reg_add+1;
 			buf8    = buf8+1;
+			count   = count+1;
 		}
 		
 		// CRCを回避し、次のコマンドへ
 		buf8 = buf8+2;
+		count= count+2;
 	}
 	
 	param->PWM_C1 = StringC[ 0]*10000/1023;
@@ -310,6 +325,7 @@ void Analize_SW( unsigned char* buf, int size, struct Parameter *param )
 void Analize( unsigned char* buf, int size, struct Parameter *param )
 {
 	unsigned int* tick_pnt = (unsigned int*)(buf+BLOCK_TICK);
+	unsigned char ver[VER_SIZE+1] = VERSION;
 	param->TICK = *tick_pnt;
 
 	Analize_PWM (buf, size, param);
@@ -317,6 +333,11 @@ void Analize( unsigned char* buf, int size, struct Parameter *param )
 	Analize_UART(buf, size, param);
 	Analize_DAC (buf, size, param);
 	Analize_SW  (buf, size, param);
+	
+	for( int i=0 ; i< VER_SIZE ; i++ )
+	{
+		MICON_VERSION[i] = *(buf+BLOCK_VER+i);
+	}
 }
 
 void WriteLog( unsigned char* buf, int size, struct Parameter *param )
@@ -324,7 +345,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	//-----------------------------------------
 	//ログをそのまま書き出し
 	//-----------------------------------------
-	unsigned char  data[2000]={0};
+	static unsigned char  data[2000]={0};
 	unsigned char  *out= data;
 	unsigned char  *buf8  = 0;
 	unsigned short *buf16 = (unsigned short*)(buf+BLOCK_PWM);
@@ -339,7 +360,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	fprintf(sys_t.output_org,"[%7d],",param->TICK );
 
 	// PWM出力
-	loop = ( BLOCK_SPI - BLOCK_PWM )/ 2;
+	loop = ( PWM_SIZE )/ 2;
 	for( int i=0 ; i<loop  ; i++ )
 	{
 		sprintf( out+i*6, "%04x, ", *(buf16+i) );
@@ -347,7 +368,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	out += loop*6; // PWM領域分のアドレスを進める
 
 	// SPI
-	loop = ( BLOCK_UART - BLOCK_SPI );
+	loop = ( SPI_SIZE );
 	buf8 = buf + BLOCK_SPI;
 	
 	for( int i=0 ; i<loop  ; i++ )
@@ -359,7 +380,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	out+=2;
 
 	// UART
-	loop = ( BLOCK_LIN - BLOCK_UART );
+	loop = ( UART_SIZE );
 	buf8 = buf + BLOCK_UART;
 	for( int i=0 ; i<loop  ; i++ )
 	{
@@ -370,7 +391,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	out+=2;
 
 	// LIN
-	loop = ( BLOCK_DAC - BLOCK_LIN );
+	loop = ( LIN_SIZE );
 	buf8 = buf + BLOCK_LIN;
 	for( int i=0 ; i<loop  ; i++ )
 	{
@@ -380,8 +401,19 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	sprintf( out, " ,");
 	out+=2;
 
+	// CAN
+	loop = (CAN_SIZE);
+	buf8 = buf + BLOCK_CAN;
+	for( int i=0 ; i<loop ; i++ )
+	{
+		sprintf( out+i*2, "%02x", *(buf8+i) );
+	}
+	out += loop*2;
+	sprintf( out, " ,");
+	out+=2;
+	
 	// DAC
-	loop = ( BLOCK_SW - BLOCK_DAC )/2;
+	loop = ( DAC_SIZE )/2;
 	buf16 = (unsigned short*)(buf + BLOCK_DAC);
 	for( int i=0 ; i<loop  ; i++ )
 	{
@@ -390,13 +422,15 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	out+=6*loop;
 
 	// SW
-	loop = ( BLOCK_SIZE - BLOCK_SW )/4;
+	loop = SW_SIZE/4;
 	buf32 = (unsigned int*)(buf + BLOCK_SW);
 	for( int i=0 ; i<loop  ; i++ )
 	{
 		sprintf( out+i*10, "%08x, ", *(buf32+i) );
 	}
-
+	out+=10*loop;
+	*out=0;
+	
 	fprintf(sys_t.output_org,"%s\n",data );
 
 	//-----------------------------------------
@@ -404,7 +438,7 @@ void WriteLog( unsigned char* buf, int size, struct Parameter *param )
 	//-----------------------------------------
 	out= data;
 	fprintf(sys_t.output_analized,"[%7d],",param->TICK );
-	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+	sprintf( out, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n\0",
 					param->PWM_A1       ,
 					param->PWM_A2       ,
 					param->PWM_B1       ,
@@ -457,7 +491,7 @@ void FileOpenInt()
 	// ファイル出力設定
 	char org_fname[256]     ={0};
 	char analized_fname[256]={0};
-	unsigned char out[300]={0};
+	unsigned char out[300]  ={0};
 	
 	sprintf( org_fname     , "%s_org.csv", sys_t.label );
 	sprintf( analized_fname, "%s_ana.csv", sys_t.label );
@@ -475,7 +509,7 @@ void FileOpenInt()
 		sys_t.output_org = NULL;
 		return;                            // 異常終了
 	}
-	sprintf( out, "[Tick(ms)],Discharge,A1,A2,B1,B2,B3,UDIM21,UDIM22,-,-,-,-,-,-,SPI,UART,LIN,lcm_Dec,led_Dec1,led_Dec2,led_Dec3,-,SW_Status\n");
+	sprintf( out, "[Tick(ms)],Discharge,A1,A2,B1,B2,B3,UDIM21,UDIM22,-,-,-,-,-,-,SPI,UART,LIN,CAN,lcm_Dec,led_Dec1,led_Dec2,led_Dec3,-,SW_Status\n");
 	fprintf(sys_t.output_org,"%s",out);
 	
 
@@ -724,6 +758,23 @@ DLLAPI void GetParam( struct Parameter *param )
 	}
 }
 
+DLLAPI void GetMiconVer( char* ver )
+{
+	for( int i=0 ; i<VER_SIZE ; i++ )
+	{
+		ver[i] = (char)MICON_VERSION[i];
+	}
+}
+
+DLLAPI void GetVer( char *ver )
+{
+	const unsigned char version[] = VERSION;
+	
+	for( int i=0 ; i<VER_SIZE ; i++ )
+	{
+		ver[i] = version[i];
+	}
+}
 
 //---------------------------------------------------
 // main関数

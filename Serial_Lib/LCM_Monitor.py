@@ -66,6 +66,9 @@ DebufApl.WriteCmd.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 
 DebufApl.GetParam.argtypes   = (ctypes.POINTER(PARAM),)
 
+DebufApl.GetMiconVer.argtypes   = (ctypes.POINTER(ctypes.c_char),)
+
+DebufApl.GetVer.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 
 
 
@@ -73,6 +76,7 @@ vbu_state = 0
 ig1_state = 0
 turn_state = 0
 hlbkup_state = 0
+logging_state = 0
 
 def time_count():
     global vbu_state
@@ -81,9 +85,18 @@ def time_count():
     global hlbkup_state
     param = PARAM()
 
+    micon_ver = b'               ';
+    lib_ver   = b'               ';
+
     while True:
         DebufApl.GetParam(param)
         Static1.config(text=param.TICK)
+
+        DebufApi.GetMiconVer( micon_ver )
+        Static3.config(text=micon_ver)
+
+        DebufApi.GetVer(lib_ver)
+        Static5.config(text=lib_ver)
 
         lbl_LCMDec_val .config(text=param.DAC_LCM)
         lbl_LED1Dec_val.config(text=param.DAC_LED1)
@@ -251,6 +264,17 @@ def cmd_hlbkup():
         moji = b"hlbkup off " + b'.'
         DebufApl.WriteCmd(moji)
 
+def cmd_logging():
+    global logging_state
+    if 0 == logging_state:
+        moji = (txt_rogging.get()).encode('utf-8')
+        DebufApl.FileOpen ( moji )
+        Btn_rogging.config( text="ログ取得中" ,bg="skyblue" )
+        logging_state = 1
+    else:
+        DebufApl.FileClose  ()
+        Btn_rogging.config( text="ログ取得 off" ,bg="skyblue" )
+        logging_state = 0
 
 frame=1
 stop_flag=False
@@ -276,7 +300,7 @@ txt_LCMDec.insert(tk.END,"30")
 lbl_LCMDec_val = tk.Label(text=b'test',width=10,anchor="w")
 lbl_LCMDec_val.grid(row=0, column=2)
 var_lcm = tk.IntVar( master=root,value=30)
-sc_lcm  = tk.Scale( root, variable=var_lcm, orient='horizontal', length=170, from_=-20, to=150, command=lcm_dec_slide)
+sc_lcm  = tk.Scale( root, variable=var_lcm, orient='horizontal', length=170, from_=-40, to=155, command=lcm_dec_slide)
 sc_lcm.grid(row=1, column=0)
 
 # LED1温度用ボタン等
@@ -287,7 +311,7 @@ txt_LED1Dec.insert(tk.END,"30")
 lbl_LED1Dec_val = tk.Label(text=b'test',width=10,anchor="w")
 lbl_LED1Dec_val.grid(row=2, column=2)
 var_led1 = tk.IntVar( master=root, value=30)
-sc_led1  = tk.Scale( root, variable=var_led1, orient='horizontal', length=170, from_=-20, to=150, command=led1_dec_slide)
+sc_led1  = tk.Scale( root, variable=var_led1, orient='horizontal', length=170, from_=-40, to=155, command=led1_dec_slide)
 sc_led1.grid(row=3, column=0)
 
 # LED2温度用ボタン等
@@ -298,7 +322,7 @@ txt_LED2Dec.insert(tk.END,"30")
 lbl_LED2Dec_val = tk.Label(text=b'test',width=10,anchor="w")
 lbl_LED2Dec_val.grid(row=0, column=5)
 var_led2 = tk.IntVar( master=root, value=30)
-sc_led2  = tk.Scale( root, variable=var_led2, orient='horizontal', length=170, from_=-20, to=150, command=led2_dec_slide)
+sc_led2  = tk.Scale( root, variable=var_led2, orient='horizontal', length=170, from_=-40, to=155, command=led2_dec_slide)
 sc_led2.grid(row=1, column=3)
 
 # LED3温度用ボタン等
@@ -309,10 +333,10 @@ txt_LED3Dec.insert(tk.END,"30")
 lbl_LED3Dec_val = tk.Label(text=b'test',width=10,anchor="w")
 lbl_LED3Dec_val.grid(row=2, column=5)
 var_led3 = tk.IntVar( master=root, value=30)
-sc_led3  = tk.Scale( root, variable=var_led3, orient='horizontal', length=170, from_=-20, to=150, command=led3_dec_slide)
+sc_led3  = tk.Scale( root, variable=var_led3, orient='horizontal', length=170, from_=-40, to=155, command=led3_dec_slide)
 sc_led3.grid(row=3, column=3)
 
-#ラベル
+#TICK
 Static1 = tk.Label(text=u'test',width=10,anchor="w")
 Static1.grid(row=0, column=6)
 
@@ -497,17 +521,16 @@ lbl_Boost_val.grid(row=20, column=5)
 Btn_Cmd =tk.Button(root,text="CMD",command=cmd_exe).grid(row=22, column=0)
 txt_Cmd = tk.Entry(text=b'CMD',width=10)
 txt_Cmd.grid(row=22, column=1)
-lbl_Cmd1 = tk.Label(text='vbu [on/off]',width=15,anchor="w")
-lbl_Cmd1.grid(row=23, column=0)
-lbl_Cmd2 = tk.Label(text='ig1 [on/off]',width=15,anchor="w")
-lbl_Cmd2.grid(row=24, column=0)
-lbl_Cmd3 = tk.Label(text='hlbkup [on/off]',width=15,anchor="w")
-lbl_Cmd3.grid(row=25, column=0)
-lbl_Cmd4 = tk.Label(text='turn [on/off]',width=15,anchor="w")
-lbl_Cmd4.grid(row=26, column=0)
-lbl_Cmd5 = tk.Label(text='echo コメント ',width=15,anchor="w")
-lbl_Cmd5.grid(row=27, column=0)
 
+#バージョン情報
+Static2 = tk.Label(text=u'micon_ver',width=10,anchor="w")
+Static2.grid(row=25, column=0)
+Static3 = tk.Label(text=u'micon_ver',width=10,anchor="w")
+Static3.grid(row=25, column=1)
+Static4 = tk.Label(text=u'lib_ver',width=10,anchor="w")
+Static4.grid(row=26, column=0)
+Static5 = tk.Label(text=u'lib_ver',width=10,anchor="w")
+Static5.grid(row=26, column=1)
 
 # 復活の呪文
 Btn_Fukkatsu =tk.Button(root,text="復活の呪文",command=cmd_fukkatsu).grid(row=22, column=3)
@@ -521,6 +544,12 @@ Btn_Turn      =tk.Button(root,text="Turn off"       ,command=cmd_turn)
 Btn_Turn.grid(row=24, column=3)
 Btn_Hlbkup    =tk.Button(root,text="H/L Bkup off"       ,command=cmd_hlbkup)
 Btn_Hlbkup.grid(row=24, column=4)
+Btn_rogging    =tk.Button(root,text="ログ取得 off"       ,command=cmd_logging)
+Btn_rogging.grid(row=25, column=3)
+txt_rogging = tk.Entry(text=b'LOG',width=20)
+txt_rogging.grid(row=25, column=4)
+txt_rogging.insert(tk.END,"Python")
+
 #---------------------------------------------------
 thread = threading.Thread(target=time_count)
 thread.start()
