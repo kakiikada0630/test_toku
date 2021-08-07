@@ -77,6 +77,7 @@ ig1_state = 0
 turn_state = 0
 hlbkup_state = 0
 logging_state = 0
+vcc_state = 0
 
 def time_count():
     global vbu_state
@@ -275,6 +276,23 @@ def cmd_logging():
         DebufApl.FileClose  ()
         Btn_rogging.config( text="ログ取得 off" ,bg="SystemButtonFace" )
         logging_state = 0
+
+def cmd_vcc():
+    global vcc_state
+    if 0 == vcc_state:
+        moji = b"vcc on" + b'.'
+        DebufApl.WriteCmd(moji)
+        Btn_vcc.config( text="+B電源 on" ,bg="skyblue" )
+        vcc_state = 1
+    else:
+        moji = b"vcc off" + b'.'
+        DebufApl.WriteCmd(moji)
+        Btn_vcc.config( text="+B電源 off" ,bg="SystemButtonFace" )
+        vcc_state = 0
+
+def cmd_setvcc():
+    moji = b"vcc setvol " + (txt_setvcc.get()).encode('utf-8') + b'.'
+    DebufApl.WriteCmd(moji)
 
 frame=1
 stop_flag=False
@@ -550,6 +568,14 @@ Btn_rogging.grid(row=25, column=3)
 txt_rogging = tk.Entry(text=b'LOG',width=20)
 txt_rogging.grid(row=25, column=4)
 txt_rogging.insert(tk.END,"Python")
+
+Btn_vcc    =tk.Button(root,text="+B電源 off"       ,command=cmd_vcc)
+Btn_vcc.grid(row=26, column=3)
+txt_setvcc = tk.Entry(text=b'SETVCC',width=20)
+txt_setvcc.grid(row=26, column=4)
+txt_setvcc.insert(tk.END,"1200")
+Btn_setvcc =tk.Button(root,text="Set"       ,command=cmd_setvcc)
+Btn_setvcc.grid(row=26, column=5)
 
 #---------------------------------------------------
 thread = threading.Thread(target=time_count)

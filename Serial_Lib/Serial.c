@@ -150,11 +150,19 @@ HANDLE serial_open(char *pname, unsigned int baud)
 	// COMポートの通信設定
 	GetCommState(seral_haldle, &dcb);
 	dcb.BaudRate = baud;
+	dcb.fBinary  = TRUE;
+	dcb.ByteSize = 8;
+	dcb.fParity  = NOPARITY;
+	dcb.StopBits = ONESTOPBIT;
 	if ( SetCommState(seral_haldle, &dcb) == FALSE ) {
 		CloseHandle(seral_haldle);
 		return INVALID_HANDLE_VALUE;
 	}
 
+	// COMポートの初期化
+	PurgeComm(seral_haldle,PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR | PURGE_RXCLEAR );
+	
+	
 	// COMポートのタイムアウト設定
 	ZeroMemory(&timeout,sizeof(COMMTIMEOUTS));
 	timeout.ReadIntervalTimeout = MAXDWORD;
@@ -241,6 +249,7 @@ DWORD WINAPI serial_thread(LPVOID param)
 			}
 			
 			// データ送信
+			printf("cmd=%x %x %x %x %x %x %x %x\n", send_buf[0], send_buf[1], send_buf[2], send_buf[3], send_buf[4], send_buf[5], send_buf[6], send_buf[7]);
 			ret = WriteFile(serial_handle, send_buf, send_size, &send_len, NULL);
 			if ( ret == FALSE ) {
 				obj->msg = "WriteFile failed.";
