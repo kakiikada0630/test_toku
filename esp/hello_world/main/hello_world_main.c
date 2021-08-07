@@ -32,61 +32,31 @@
 #include "bin_format.h"
 
 
-#define SPI_DATA_SIZE 100  //spiデータサイズ
-#define URT_DATA_SIZE 500  //uartデータサイズ
-#define LIN_DATA_SIZE  20  //spiデータサイズ
-
-void set_pwm()
-{
-    /*
-     * Prepare and set configuration of timers
-     * that will be used by LED Controller
-     */
-    ledc_timer_config_t ledc_timer = {
-        .duty_resolution = LEDC_TIMER_10_BIT,    // resolution of PWM duty
-        .freq_hz         = 200,                  // frequency of PWM signal
-        .speed_mode      = LEDC_HIGH_SPEED_MODE, // timer mode
-        .timer_num       = LEDC_TIMER_0          // timer index
-    };
-    // Set configuration of timer0 for high speed channels
-    ledc_timer_config(&ledc_timer);
-
-    ledc_channel_config_t ledc_channel = {
-        .channel    = LEDC_CHANNEL_0,
-        .duty       = 716,
-        .gpio_num   = DEBUG_PWM_PIN,
-        .speed_mode = LEDC_HIGH_SPEED_MODE,
-        .hpoint     = 0,
-        .timer_sel  = LEDC_TIMER_0
-    };
-
-    // Set LED Controller with previously prepared configuration
-    ledc_channel_config(&ledc_channel);
-}
-
 //static void SendData()
 void SendData()
 {
     int32_t         i              = 0;
     static int64_t  start_time     = 0;
     static int64_t  next_start_time= 0;
-	static uint8_t  urt_data[URT_DATA_SIZE] = {0};
-	static uint8_t  lin_data[LIN_DATA_SIZE] = {0};
-	static uint16_t spi_data[SPI_DATA_SIZE] = {0};
+	static uint8_t  urt_data[UART_SIZE] = {0};
+	static uint8_t  lin_data[LIN_SIZE] = {0};
+	static uint16_t spi_data[SPI_SIZE] = {0};
+	static uint16_t can_data[CAN_SIZE] = {0};
 	int32_t spi_size = 0;
 	int32_t urt_size = 0;
 	int32_t lin_size = 0;
+	int32_t can_size = 0;
 
 
 	next_start_time = esp_timer_get_time();
 	while (1) {
-		memset( urt_data, 0, sizeof(uint8_t )*URT_DATA_SIZE );
-		memset( lin_data, 0, sizeof(uint8_t )*LIN_DATA_SIZE );
-		memset( spi_data, 0, sizeof(uint16_t)*SPI_DATA_SIZE );
+		memset( urt_data, 0, sizeof(uint8_t )*UART_SIZE );
+		memset( lin_data, 0, sizeof(uint8_t )*LIN_SIZE );
+		memset( spi_data, 0, sizeof(uint16_t)*SPI_SIZE );
 
-		spi_size        = get_spi_data( spi_data, SPI_DATA_SIZE );
-		urt_size        = recv_uart   ( urt_data, URT_DATA_SIZE );
-		lin_size        = recv_lin    ( lin_data, LIN_DATA_SIZE );
+		spi_size        = get_spi_data( spi_data, SPI_SIZE );
+		urt_size        = recv_uart   ( urt_data, UART_SIZE );
+		lin_size        = recv_lin    ( lin_data, LIN_SIZE );
 
 		int32_t  buf;
 		uint32_t pwm_log  = get_pwm_log_onoff();
@@ -151,21 +121,26 @@ void SendData()
 		if( bin_log )
 		{
 			unsigned char bin_buf[BLOCK_SIZE]={0};
+			unsigned char ver_buf[VER_SIZE+1]= VERSION;
 			uint32_t *tick_pnt = 0;
 			uint16_t *pwm_pnt  = 0;
 			uint8_t  *spi_pnt  = 0;
 			uint8_t  *urt_pnt  = 0;
 			uint8_t  *lin_pnt  = 0;
+			uint8_t  *can_pnt  = 0;
 			uint16_t *adc_pnt  = 0;
-			uint32_t *sw_pnt  = 0;
+			uint32_t *sw_pnt   = 0;
+			uint32_t *ver_pnt  = 0;
 			
 			tick_pnt = (uint32_t *)&bin_buf[BLOCK_TICK];
 			pwm_pnt  = (uint16_t *)&bin_buf[BLOCK_PWM ];
 			spi_pnt  = (uint8_t  *)&bin_buf[BLOCK_SPI ];
 			urt_pnt  = (uint8_t  *)&bin_buf[BLOCK_UART];
 			lin_pnt  = (uint8_t  *)&bin_buf[BLOCK_LIN ];
+			can_pnt  = (uint8_t  *)&bin_buf[BLOCK_CAN ];
 			adc_pnt  = (uint16_t *)&bin_buf[BLOCK_DAC ];
 			sw_pnt   = (uint32_t *)&bin_buf[BLOCK_SW  ];
+			ver_pnt  = (uint32_t *)&bin_buf[BLOCK_VER ];
 			
 			memset(bin_buf, 0, BLOCK_SIZE );
 			
@@ -207,12 +182,24 @@ void SendData()
 				*(lin_pnt+j) = *(lin_data+j);
 			}
 			
+			//CAN
+			for(uint32_t j=0 ; j<can_size ; j++)
+			{
+				*(can_pnt+j) = *(can_data+j);
+			}
+			
 			*(adc_pnt  ) = get_lcm_dec();
 			*(adc_pnt+1) = get_led1_dec();
 			*(adc_pnt+2) = get_led2_dec();
 			*(adc_pnt+3) = get_led3_dec();
 			
 			*(sw_pnt)    = sw_status();
+			
+			//VERSION
+			for(uint32_t j=0 ; j<VER_SIZE ; j++)
+			{
+				*(ver_pnt+j) = ver_buf[j];
+			}
 			
 			fwrite(bin_buf, BLOCK_SIZE, 1, stdout);
 		}
@@ -249,7 +236,6 @@ void app_main()
 	// デバッグ用初期化処理
 	//------------------------
     //init_spi_master();
-    //set_pwm();
     //send_uart();
 	//------------------------
 

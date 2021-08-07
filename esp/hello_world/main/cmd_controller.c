@@ -19,14 +19,14 @@
 #include "bin_format.h"
 
 
-#define DEC2DAC_TABLE_SIZE  195
+#define DEC2DAC_TABLE_SIZE  196
 
 struct DEC2DAC
 {
 	int decimal;
 	int dac;
 } dec2dac[] = {
-	{-40	,	3958},
+	{-40	,	4095},
 	{-39	,	3951},
 	{-38	,	3943},
 	{-37	,	3935},
@@ -220,7 +220,8 @@ struct DEC2DAC
 	{151	,	 192},
 	{152	,	 189},
 	{153	,	 186},
-	{154	,	 183}
+	{154	,	 183},
+	{155	,	   0}
 };
 
 
@@ -229,6 +230,7 @@ struct DEC2DAC
 
 static char  cmd[CMD_BUF_SIZE];
 static uint32_t SwStatus =0;
+
 
 static inline void CMD_HLBackUp( const char* op1 )
 {
@@ -495,6 +497,10 @@ void exec_cmd()
 			{
 				//fwrite( cmd+5, CMD_BUF_SIZE-6, 1, stdout );
 			}
+			else if( 0 == memcmp(cmd_buf, "ver", 3 ) )
+			{
+				sprintf( cmd, "%s\n", VERSION ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+			}
 			else if( 0 == memcmp(cmd_buf, "help", 4 ) )
 			{
 				sprintf( cmd ,"*** “dŒ¹ ***            \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
@@ -511,6 +517,7 @@ void exec_cmd()
 				sprintf( cmd ,"dac    [ch] [’l(0-4095)]\n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"\n*** ‚»‚Ì‘¼ ***        \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 				sprintf( cmd ,"echo   [•¶Žš—ñ]         \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
+				sprintf( cmd ,"ver                     \n" ); fwrite( cmd, CMD_BUF_SIZE, 1, stdout );
 			}
 			else
 			{
