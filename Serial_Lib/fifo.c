@@ -42,10 +42,19 @@ unsigned int fifo_read(fifo_t *obj, unsigned char *buf, unsigned int size)
 {
 	unsigned int ret = 0;
 	
-	while ( obj->read != obj->write && ret < size ) {
+	while ( (obj->read != obj->write) && (ret < size) ) {
 		buf[ret] = obj->buf[obj->read];
 		obj->read = (obj->read + 1) % obj->size;
-		ret++;
+		
+		if( buf[ret] == '.' )
+		{
+			ret++;
+			break;
+		}
+		else
+		{
+			ret++;
+		}
 	}
 	
 	return ret;

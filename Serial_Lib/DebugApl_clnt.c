@@ -11,7 +11,7 @@ HANDLE hPipe = INVALID_HANDLE_VALUE;
 //---------------------------------------------------
 // ŠO•”ŒöŠJŠÖ”
 //---------------------------------------------------
-DLLAPI void OpenSerial(char* com_name)
+DLLAPI void OpenSerial(char* com_dbg, char* com_plusb)
 {
 }
 

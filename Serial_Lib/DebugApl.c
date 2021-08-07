@@ -606,19 +606,23 @@ DWORD WINAPI execute_serverthread(LPVOID param)
 //---------------------------------------------------
 // 外部公開関数
 //---------------------------------------------------
-DLLAPI void OpenSerial(char* com_name)
+DLLAPI void OpenSerial(char* com_dbg, char* com_plusb)
 {
 	//------- 動作ログ用 -------
 	char log_fname[256]     ="LOG_FILE.txt";
 
 	if( log_file == NULL ) { log_file = fopen(log_fname, "w"); }
-	if( log_file != NULL ) { fprintf( log_file, "[%s] COM=%s\n", __func__, com_name ); }
+	if( log_file != NULL ) { fprintf( log_file, "[%s] COM=%s\n", __func__, com_dbg ); }
+	if( log_file != NULL ) { fprintf( log_file, "[%s] COM=%s\n", __func__, com_plusb ); }
 	//------- 動作ログ用 -------
 
+	//----------------------------------------
 	// スレッド処理実行開始
 	sys_t.thread_server_handle = CreateThread(NULL,0,execute_serverthread,NULL,0,&sys_t.thread_server_id);
 
-	sys_t.obj = serial_create(com_name,921600);
+	//----------------------------------------
+	// デバッグボード, +B用安定化電源とのシリアル通信路開設
+	sys_t.obj = serial_create(com_dbg,921600,com_plusb,9600);
 	if ( sys_t.obj == NULL ) {
 		if( log_file != NULL ) { fprintf(log_file,"[%s][err]オブジェクト生成に失敗\n", __func__);}
 		return;
@@ -628,7 +632,7 @@ DLLAPI void OpenSerial(char* com_name)
 
 	// 基板側の起動
 	Sleep(100);
-	serial_send(sys_t.obj,"bin on\n",sizeof("bin on\n"));
+	serial_send(sys_t.obj,"bin on.",sizeof("bin on."));
 	if( log_file != NULL ) { fprintf( log_file, "[%s] serial_send=%s\n", __func__, "bin on\\n" ); }
 	// スレッド処理実行開始
 	sys_t.thread_active = TRUE;
@@ -731,7 +735,7 @@ int main (int argc, char *argv[])
 	unsigned char buf[1024]; 
 	int len;
 
-	sys_t.obj = serial_create(argv[1],921600);
+	sys_t.obj = serial_create(argv[1],921600,argv[2],9600);
 	if ( sys_t.obj == NULL ) {
 		fprintf(stderr,"オブジェクト生成に失敗");
 		return EXIT_FAILURE;

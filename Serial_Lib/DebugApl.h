@@ -64,7 +64,7 @@ DLLAPI void FileOpen( char *plabel );
 
 DLLAPI void FileClose();
 
-DLLAPI void OpenSerial(char* com_name);
+DLLAPI void OpenSerial(char* com_dbg, char* com_plusb);
 
 DLLAPI void CloseSerial();
 

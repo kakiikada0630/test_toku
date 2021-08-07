@@ -6,7 +6,8 @@ import ctypes
 #-----------------------------------
 # 環境に合わせて変える!!!
 #-----------------------------------
-COM_NAME = b"\\\.\COM7"
+COM_DBG   = b"\\\.\COM7"
+COM_PLUSB = b"\\\.\COM8"
 
 #-----------------------------------
 
@@ -59,7 +60,7 @@ DebufApl = ctypes.WinDLL("./DebgApl_server.dll")
 
 DebufApl.FileOpen.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 
-DebufApl.OpenSerial.argtypes = (ctypes.POINTER(ctypes.c_char),)
+DebufApl.OpenSerial.argtypes = (ctypes.POINTER(ctypes.c_char,), ctypes.POINTER(ctypes.c_char,),)
 
 DebufApl.WriteCmd.argtypes   = (ctypes.POINTER(ctypes.c_char),)
 
@@ -153,101 +154,101 @@ def time_count():
 
 
 def lcm_dec():
-    moji = b"dac 0 " + (txt_LCMDec.get()).encode('utf-8') + b'\n'
+    moji = b"dac 0 " + (txt_LCMDec.get()).encode('utf-8') + b'.'
     var_lcm.set( txt_LCMDec.get() )
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def lcm_dec_slide(*arg):
-    moji = b"dac 0 " + str( var_lcm.get() ).encode('utf-8') + b'\n'
+    moji = b"dac 0 " + str( var_lcm.get() ).encode('utf-8') + b'.'
     txt_LCMDec.delete(0,tk.END)
     txt_LCMDec.insert(tk.END,str( var_lcm.get() ))
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led1_dec():
-    moji = b"dac 1 " + (txt_LED1Dec.get()).encode('utf-8') + b'\n'
+    moji = b"dac 1 " + (txt_LED1Dec.get()).encode('utf-8') + b'.'
     var_led1.set( txt_LED1Dec.get() )
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led1_dec_slide(*arg):
-    moji = b"dac 1 " + str( var_led1.get() ).encode('utf-8') + b'\n'
+    moji = b"dac 1 " + str( var_led1.get() ).encode('utf-8') + b'.'
     txt_LED1Dec.delete(0,tk.END)
     txt_LED1Dec.insert(tk.END,str( var_led1.get() ))
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led2_dec():
-    moji = b"dac 2 " + (txt_LED2Dec.get()).encode('utf-8') + b'\n'
+    moji = b"dac 2 " + (txt_LED2Dec.get()).encode('utf-8') + b'.'
     var_led2.set( txt_LED2Dec.get() )
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led2_dec_slide(*arg):
-    moji = b"dac 2 " + str( var_led2.get() ).encode('utf-8') + b'\n'
+    moji = b"dac 2 " + str( var_led2.get() ).encode('utf-8') + b'.'
     txt_LED2Dec.delete(0,tk.END)
     txt_LED2Dec.insert(tk.END,str( var_led2.get() ))
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led3_dec():
-    moji = b"dac 3 " + (txt_LED3Dec.get()).encode('utf-8') + b'\n'
+    moji = b"dac 3 " + (txt_LED3Dec.get()).encode('utf-8') + b'.'
     var_led3.set( txt_LED3Dec.get() )
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def led3_dec_slide(*arg):
-    moji = b"dac 3 " + str( var_led3.get() ).encode('utf-8') + b'\n'
+    moji = b"dac 3 " + str( var_led3.get() ).encode('utf-8') + b'.'
     txt_LED3Dec.delete(0,tk.END)
     txt_LED3Dec.insert(tk.END,str( var_led3.get() ))
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def cmd_exe():
-    moji = (txt_Cmd.get()).encode('utf-8') + b'\n'
+    moji = (txt_Cmd.get()).encode('utf-8') + b'.'
     #print( moji )
     DebufApl.WriteCmd(moji)
 
 def cmd_fukkatsu():
-    moji = b"bin on " + b'\n'
+    moji = b"bin on " + b'.'
     DebufApl.WriteCmd(moji)
 
 def cmd_vbu():
     global vbu_state
     global Btn_Vbu
     if 0 == vbu_state:
-        moji = b"vbu on " + b'\n'
+        moji = b"vbu on " + b'.'
         DebufApl.WriteCmd(moji)
     else:
-        moji = b"vbu off " + b'\n'
+        moji = b"vbu off " + b'.'
         DebufApl.WriteCmd(moji)
 
 def cmd_ig1():
     global ig1_state
     if 0 == ig1_state:
-        moji = b"ig1 on " + b'\n'
+        moji = b"ig1 on " + b'.'
         DebufApl.WriteCmd(moji)
     else:
-        moji = b"ig1 off " + b'\n'
+        moji = b"ig1 off " + b'.'
         DebufApl.WriteCmd(moji)
 
 def cmd_turn():
     global turn_state
     if 0 == turn_state:
-        moji = b"turn on " + b'\n'
+        moji = b"turn on " + b'.'
         DebufApl.WriteCmd(moji)
     else:
-        moji = b"turn off " + b'\n'
+        moji = b"turn off " + b'.'
         DebufApl.WriteCmd(moji)
 
 def cmd_hlbkup():
     global hlbkup_state
     if 0 == hlbkup_state:
-        moji = b"hlbkup on " + b'\n'
+        moji = b"hlbkup on " + b'.'
         DebufApl.WriteCmd(moji)
     else:
-        moji = b"hlbkup off " + b'\n'
+        moji = b"hlbkup off " + b'.'
         DebufApl.WriteCmd(moji)
 
 
@@ -262,8 +263,7 @@ root=tk.Tk()
 #---------------------------------------------------
 # シリアル開始開始
 #---------------------------------------------------
-DebufApl.OpenSerial(COM_NAME)
-DebufApl.FileOpen  (b"Python")
+DebufApl.OpenSerial(COM_DBG, COM_PLUSB)
 
 #---------------------------------------------------
 # 温度関連
