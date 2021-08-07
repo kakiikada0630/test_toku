@@ -442,7 +442,7 @@ void exec_cmd()
 		cmd[index] = (char)data;
 		index++;
 		
-		if( data == '\n' )
+		if( data == '.' )
 		{
 			char cmd_buf[20]={0};
 			char option1[10]={0};
