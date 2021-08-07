@@ -89,6 +89,7 @@ serial_t serial_create(char *p_dbg_name, unsigned int p_dbg_baud, char *p_plusb_
 	// デバッグボード用COMポートの初期化
 	obj->handle = serial_open( p_dbg_name, p_dbg_baud );
 	if ( obj->handle == INVALID_HANDLE_VALUE ) {
+		printf("DebugBoard Serial Open Error.\n");
 		CloseHandle(obj->handle);
 		free(obj);
 		return NULL;
@@ -99,7 +100,6 @@ serial_t serial_create(char *p_dbg_name, unsigned int p_dbg_baud, char *p_plusb_
 	obj->handle_plusb = serial_open( p_plusb_name, p_plusb_baud );
 	if ( obj->handle_plusb == INVALID_HANDLE_VALUE ) {
 		printf("PlusB Serial Open Error.\n");
-		return NULL;
 	}
 
 	// FIFOメモリ確保
@@ -200,7 +200,7 @@ DWORD WINAPI serial_thread(LPVOID param)
 	BOOL ret;
 	BOOL recv_hold = FALSE;
 	BOOL send_hold = FALSE;
-	HANDLE         seral_haldle;
+	HANDLE         serial_handle;
 	BOOL vcc_ctrl  = FALSE;
 
 	
@@ -230,11 +230,18 @@ DWORD WINAPI serial_thread(LPVOID param)
 			// 送信内容から送信先を選択
 			vcc_ctrl = is_vcc_ctrlcmd( send_buf, &send_size );
 			
-			if( TRUE == vcc_ctrl )	{ seral_haldle = obj->handle_plusb;	}
-			else					{ seral_haldle = obj->handle;		}
+			if( TRUE == vcc_ctrl )	{ serial_handle = obj->handle_plusb;	}
+			else					{ serial_handle = obj->handle;		}
+			
+			if( serial_handle == INVALID_HANDLE_VALUE )
+			{
+				// シリアル通信路Openできていないため終了する。
+				send_hold = FALSE;
+				continue;
+			}
 			
 			// データ送信
-			ret = WriteFile(seral_haldle, send_buf, send_size, &send_len, NULL);
+			ret = WriteFile(serial_handle, send_buf, send_size, &send_len, NULL);
 			if ( ret == FALSE ) {
 				obj->msg = "WriteFile failed.";
 				break;

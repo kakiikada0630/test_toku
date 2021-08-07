@@ -38,7 +38,7 @@ static sysctrl_t sys_t={0};
 FILE *log_file;
 
 
-static unsigned char MICON_VERSION[VER_SIZE] = {0};
+static unsigned char MICON_VERSION[VER_SIZE+1] = {0};
 
 void Analize_PWM( unsigned char* buf, int size, struct Parameter *param )
 {
@@ -621,6 +621,12 @@ DWORD WINAPI execute_serverthread(LPVOID param)
 	                //fprintf(log_file, "Couldn't read NamedPipe.\n");
 	                break;
 	        }
+			
+			for(int i=0 ; i<dwBytesRead ; i++)
+			{
+				if( '\n' == szBuff[i] ){ szBuff[i]='.'; }
+			}
+			
 	        szBuff[dwBytesRead] = '\0';
 			serial_send(sys_t.obj,szBuff,dwBytesRead);
 	        fprintf(log_file, "[%s]cmd=%s", __func__, szBuff);
@@ -666,7 +672,7 @@ DLLAPI void OpenSerial(char* com_dbg, char* com_plusb)
 
 	// 基板側の起動
 	Sleep(100);
-	serial_send(sys_t.obj,"bin on.",sizeof("bin on."));
+	serial_send(sys_t.obj,"bin on. ",sizeof("bin on. "));
 	if( log_file != NULL ) { fprintf( log_file, "[%s] serial_send=%s\n", __func__, "bin on\\n" ); }
 	// スレッド処理実行開始
 	sys_t.thread_active = TRUE;

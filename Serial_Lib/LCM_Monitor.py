@@ -92,10 +92,10 @@ def time_count():
         DebufApl.GetParam(param)
         Static1.config(text=param.TICK)
 
-        DebufApi.GetMiconVer( micon_ver )
+        DebufApl.GetMiconVer( micon_ver )
         Static3.config(text=micon_ver)
 
-        DebufApi.GetVer(lib_ver)
+        DebufApl.GetVer(lib_ver)
         Static5.config(text=lib_ver)
 
         lbl_LCMDec_val .config(text=param.DAC_LCM)
@@ -273,7 +273,7 @@ def cmd_logging():
         logging_state = 1
     else:
         DebufApl.FileClose  ()
-        Btn_rogging.config( text="ログ取得 off" ,bg="skyblue" )
+        Btn_rogging.config( text="ログ取得 off" ,bg="SystemButtonFace" )
         logging_state = 0
 
 frame=1
@@ -531,6 +531,7 @@ Static4 = tk.Label(text=u'lib_ver',width=10,anchor="w")
 Static4.grid(row=26, column=0)
 Static5 = tk.Label(text=u'lib_ver',width=10,anchor="w")
 Static5.grid(row=26, column=1)
+
 
 # 復活の呪文
 Btn_Fukkatsu =tk.Button(root,text="復活の呪文",command=cmd_fukkatsu).grid(row=22, column=3)

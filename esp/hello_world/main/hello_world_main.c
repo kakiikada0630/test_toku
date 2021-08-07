@@ -130,7 +130,7 @@ void SendData()
 			uint8_t  *can_pnt  = 0;
 			uint16_t *adc_pnt  = 0;
 			uint32_t *sw_pnt   = 0;
-			uint32_t *ver_pnt  = 0;
+			uint8_t  *ver_pnt  = 0;
 			
 			tick_pnt = (uint32_t *)&bin_buf[BLOCK_TICK];
 			pwm_pnt  = (uint16_t *)&bin_buf[BLOCK_PWM ];
@@ -140,7 +140,7 @@ void SendData()
 			can_pnt  = (uint8_t  *)&bin_buf[BLOCK_CAN ];
 			adc_pnt  = (uint16_t *)&bin_buf[BLOCK_DAC ];
 			sw_pnt   = (uint32_t *)&bin_buf[BLOCK_SW  ];
-			ver_pnt  = (uint32_t *)&bin_buf[BLOCK_VER ];
+			ver_pnt  = (uint8_t  *)&bin_buf[BLOCK_VER ];
 			
 			memset(bin_buf, 0, BLOCK_SIZE );
 			

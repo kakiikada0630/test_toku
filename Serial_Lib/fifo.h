@@ -30,7 +30,7 @@
 #define SW_TURNS_STATUS  0x00000004
 #define SW_HLBKUP_STATUS 0x00000008
 
-#define VERSION "a. base.0000"
+#define VERSION "a. base.0001"
 
 #define FIFO_BUFSIZE	 BLOCK_SIZE * 400
 
