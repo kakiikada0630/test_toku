@@ -201,8 +201,8 @@ void serial_delete(serial_t obj)
 DWORD WINAPI serial_thread(LPVOID param)
 {
 	serial_t obj = (serial_t) param;
-	BYTE recv_buf[SERIAL_TMP_BUFSIZE];
-	BYTE send_buf[SERIAL_TMP_BUFSIZE];
+	BYTE recv_buf[SERIAL_TMP_BUFSIZE]={0};
+	BYTE send_buf[SERIAL_TMP_BUFSIZE]={0};
 	DWORD recv_len;
 	DWORD send_len,send_size;
 	BOOL ret;
@@ -238,8 +238,16 @@ DWORD WINAPI serial_thread(LPVOID param)
 			// 送信内容から送信先を選択
 			vcc_ctrl = is_vcc_ctrlcmd( send_buf, &send_size );
 			
-			if( TRUE == vcc_ctrl )	{ serial_handle = obj->handle_plusb;	}
-			else					{ serial_handle = obj->handle;		}
+			if( TRUE == vcc_ctrl )	
+			{
+				serial_handle = obj->handle_plusb;
+				printf("cmd=%x %x %x %x %x %x %x %x\n", send_buf[0], send_buf[1], send_buf[2], send_buf[3], send_buf[4], send_buf[5], send_buf[6], send_buf[7]);
+			}
+			else
+			{ 
+				serial_handle = obj->handle;
+				printf("%s\n", send_buf);
+			}
 			
 			if( serial_handle == INVALID_HANDLE_VALUE )
 			{
@@ -249,14 +257,16 @@ DWORD WINAPI serial_thread(LPVOID param)
 			}
 			
 			// データ送信
-			printf("cmd=%x %x %x %x %x %x %x %x\n", send_buf[0], send_buf[1], send_buf[2], send_buf[3], send_buf[4], send_buf[5], send_buf[6], send_buf[7]);
 			ret = WriteFile(serial_handle, send_buf, send_size, &send_len, NULL);
 			if ( ret == FALSE ) {
 				obj->msg = "WriteFile failed.";
 				break;
 			}
 			if ( send_size != send_len )	obj->msg = "WriteFile spilled some of q_send.";
+
+			// 送信後のステータス初期化
 			send_hold = FALSE;
+			memset(send_buf, 0, SERIAL_TMP_BUFSIZE);
 		} else if ( TryEnterCriticalSection(&(obj->cs_send)) ) {
 			send_size = fifo_read(obj->q_send, send_buf, SERIAL_TMP_BUFSIZE);
 			LeaveCriticalSection(&(obj->cs_send));
