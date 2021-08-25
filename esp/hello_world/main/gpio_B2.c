@@ -60,7 +60,10 @@ int32_t get_percent_B2()
 	int32_t buf=0;
 
 	cur_time = esp_timer_get_time();
+
+	gpio_intr_disable(GPIO_B2);
 	buf = (int32_t)(cur_time - latest_time);
+	gpio_intr_enable(GPIO_B2);
 
 	//最新の割り込み時間から7ms以上経過している場合、Dutyが
 	//0%か100.00%に張り付いていると判断する。

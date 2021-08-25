@@ -227,6 +227,25 @@ void SendData()
     }
 }
 
+void sampel()
+{
+    gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1);
+    init_gpio_discharge();
+    init_gpio_A1();
+    init_gpio_A2();
+    init_gpio_B1();
+    init_gpio_B2();
+    init_gpio_B3();
+    init_gpio_UDIM21();
+    init_gpio_UDIM22();
+    while (1) 
+    {
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+
+}
+
+
 void app_main()
 {
 	init_uart();
@@ -239,25 +258,13 @@ void app_main()
     //send_uart();
 	//------------------------
 
-    gpio_install_isr_service(0);
-    init_gpio_discharge();
-    init_gpio_A1();
-    init_gpio_A2();
-    init_gpio_B1();
-    init_gpio_B2();
-    init_gpio_B3();
-    init_gpio_UDIM21();
-    init_gpio_UDIM22();
 
 	init_cmd();
     init_spi_slave();
 
+	(int)xTaskCreatePinnedToCore(sampel, "main_loop", 4096, NULL, 1, NULL, 1);
+
 	SendData();
 
-	//xTaskCreatePinnedToCore(SendData, "main_loop", 4096, NULL, 12, NULL, 0);
 
-    //while (1) 
-    //{
-	//	vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //}
 }
